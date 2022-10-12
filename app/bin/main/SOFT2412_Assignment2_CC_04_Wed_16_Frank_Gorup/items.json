@@ -1,0 +1,30 @@
+{
+"Drinks": 
+    {
+        "Mineral Water" : [20, 3],
+        "Sprite" : [10, 5],
+        "Coca cola" : [10, 5],
+        "Pepsi" : [10, 4],
+        "Juice" : [10, 3.5]
+    },
+"Chocolates":
+    {
+        "Mars" : [12, 5],
+        "M&M" : [12, 6],
+        "Bounty" : [12, 5],
+        "Snickers" : [12, 7]
+    },
+"Chips":
+    {
+        "Smiths" : [10, 5],
+        "Pringles" : [10, 6],
+        "Kettle" : [10, 5],
+        "Thins" : [10, 4]
+    },
+"Candies":
+    {
+        "Mentos" : [15, 3],
+        "Sour Patch" : [12, 5],
+        "Skittles" : [12, 6]
+    }
+}
