@@ -3,7 +3,7 @@
     {
         "Mineral Water" : [20, 3],
         "Sprite" : [10, 5],
-        "Coca cola" :[10, 5],
+        "Coca cola" : [10, 5],
         "Pepsi" : [10, 4],
         "Juice" : [10, 3.5]
     },
