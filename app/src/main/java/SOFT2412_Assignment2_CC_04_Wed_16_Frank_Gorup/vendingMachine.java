@@ -31,6 +31,10 @@ public class vendingMachine {
         return true;
     }
 
+    public User getCurrentUser(){
+        return this.currentUser;
+    }
+
     // return false if invalid or user and password combination does not exist
     public boolean login(String username, String password) {
         if (username == null || password == null) {
