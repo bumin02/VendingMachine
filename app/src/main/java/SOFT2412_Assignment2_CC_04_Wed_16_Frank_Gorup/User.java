@@ -5,10 +5,15 @@ import java.util.ArrayList;
 public class User {
     String account;
     String password;
+    int id;
+
+    // i think we can create a table called orderHistory with
+    // a foreign key linking to the user
     ArrayList<History> histories;
     Card card;
 
-    public User(String account, String password) {
+    public User(int id, String account, String password) {
+        this.id = id;
         this.account = account;
         this.password = password;
         this.histories = new ArrayList<>();

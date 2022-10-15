@@ -13,79 +13,40 @@ import java.util.ArrayList;
 
 public class JsonParser {
 
-	ArrayList<Items> itemList = new ArrayList<>();
-
 	/**
 	 * This method reads the configuration file and creates the pool table
+	 * 
 	 * @param path
 	 */
-	public void parse(String path) {
+	public static ArrayList<Card> parseCreditCardFile() {
 
 		JSONParser parser = new JSONParser();
+
 		try {
-			Object object = parser.parse(new FileReader(path));
 
-			JSONObject jsonObject = (JSONObject) object;
+			String currentDirectory = System.getProperty("user.dir");
+			String path = currentDirectory + "/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/credit_cards.json";
 
-			JSONArray jsonDrinks = (JSONArray) jsonObject.get("Drinks");
+			Object obj = parser
+					.parse(new FileReader(path));
 
-			for (Object obj : jsonDrinks) {
-				JSONObject item = (JSONObject) obj;
+			JSONArray jsonArray = (JSONArray) obj;
 
-				String name = (String) item.get("name");
-				String code = (String) item.get("code");
-				int qty = (int) item.get("qty");
-				Long price = (Long) item.get("price");
+			ArrayList<Card> cardList = new ArrayList<>();
 
-				// System.out.println("Name: " + name + " Code: " + code + " qty: " + qty + " price: " + price);
-				Items item1 = new Items(name, code, "Drink", price, qty);
-				itemList.add(item1);
+			for (int i = 0; i < jsonArray.size(); i++) {
+
+				JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+				String name = (String) jsonObject.get("name");
+				String number = (String) jsonObject.get("number");
+
+				Card card = new Card(name, number);
+				cardList.add(card);
+
 			}
 
-			JSONArray jsonChocolates = (JSONArray) jsonObject.get("Chocolates");
-
-			for (Object obj : jsonChocolates) {
-				JSONObject item = (JSONObject) obj;
-
-				String name = (String) item.get("name");
-				String code = (String) item.get("code");
-				int qty = (int) item.get("qty");
-				Long price = (Long) item.get("price");
-
-				// System.out.println("Name: " + name + " Code: " + code + " qty: " + qty + " price: " + price);
-				Items item1 = new Items(name, code, "Chocolate", price, qty);
-				itemList.add(item1);
-			}
-
-			JSONArray jsonChips = (JSONArray) jsonObject.get("Chips");
-
-			for (Object obj : jsonChips) {
-				JSONObject item = (JSONObject) obj;
-
-				String name = (String) item.get("name");
-				String code = (String) item.get("code");
-				int qty = (int) item.get("qty");
-				Long price = (Long) item.get("price");
-
-				// System.out.println("Name: " + name + " Code: " + code + " qty: " + qty + " price: " + price);
-				Items item1 = new Items(name, code, "Chip", price, qty);
-				itemList.add(item1);
-			}
-
-			JSONArray jsonCandies = (JSONArray) jsonObject.get("Candies");
-
-			for (Object obj : jsonCandies) {
-				JSONObject item = (JSONObject) obj;
-
-				String name = (String) item.get("name");
-				String code = (String) item.get("code");
-				int qty = (int) item.get("qty");
-				Long price = (Long) item.get("price");
-
-				// System.out.println("Name: " + name + " Code: " + code + " qty: " + qty + " price: " + price);
-				Items item1 = new Items(name, code, "Candy", price, qty);
-				itemList.add(item1);
-			}
+			return cardList;
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -94,9 +55,9 @@ public class JsonParser {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+
+		return null;
+
 	}
 
-	public ArrayList<Items> getItemList(){
-		return itemList;
-	}
 }

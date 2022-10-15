@@ -1,14 +1,13 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
-public class Items{
+public class Item {
     String name;
     String code;
     String category;
-    long price;
+    double price;
     int quantity;
 
-
-    public Items(String name, String code, String category, long price, int quantity){
+    public Item(String name, String code, String category, double price, int quantity) {
         this.name = name;
         this.code = code;
         this.category = category;
