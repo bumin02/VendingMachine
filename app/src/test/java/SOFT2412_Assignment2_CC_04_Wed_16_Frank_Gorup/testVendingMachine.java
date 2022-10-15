@@ -14,11 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class testVendingMachine {
     vendingMachine vm;
-
+    Database db;
 
     @BeforeEach
     public void setUp() {
-        vm = new vendingMachine();
+        db = new Database();
+        vm = new vendingMachine(db);
     }
 
     @Test
