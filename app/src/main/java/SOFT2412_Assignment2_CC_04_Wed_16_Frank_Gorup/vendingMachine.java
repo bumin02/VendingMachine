@@ -60,10 +60,17 @@ public class vendingMachine {
 
         System.out.println("\nStarting vending machine...");
         System.out.println("What would you like to do? (press help for instructions)");
+        System.out.print(">");
 
         while (sc.hasNext()) {
 
+
+
             String input = sc.nextLine();
+
+            if (input.toLowerCase().equals("list")) {
+                this.listOptions("all");
+            }
 
             if (input.toLowerCase().equals("help")) {
                 System.out.println(
@@ -86,8 +93,12 @@ public class vendingMachine {
                         "\n--------------------------------------------------------------------------------------------------------------------");
             }
 
-            System.out.println("What would you like to do? (press help for instructions)");
+            if (input.toLowerCase().equals("exit")) {
+                break;
+            }
 
+            System.out.println("What would you like to do? (press help for instructions)");
+            System.out.print(">");
         }
 
         sc.close();
