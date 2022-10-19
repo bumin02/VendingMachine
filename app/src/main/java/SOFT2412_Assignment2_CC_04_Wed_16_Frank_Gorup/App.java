@@ -11,6 +11,7 @@ public class App {
         db.setupDB();
 
         vendingMachine machine = new vendingMachine(db);
-        machine.listOptions("all");
+        // machine.listOptions("all");
+        machine.runVendingMachine();
     }
 }
