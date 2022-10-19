@@ -48,52 +48,28 @@ public class Database {
 
     createDB();
 
-    String createUsersTable = """
-        CREATE TABLE IF NOT EXISTS USERS (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          account TEXT NOT NULL,
-          password TEXT NOT NULL,
-          card_id INTEGER,
-          FOREIGN KEY (card_id) REFERENCES cards(id)
-        );
-        """;
+    String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
+        + "id integer PRIMARY KEY,"
+        + "username text NOT NULL,"
+        + "password text NOT NULL,"
+        + "balance real NOT NULL,"
+        + "admin integer NOT NULL"
+        + ");";
 
-    String createCardTable = """
-        CREATE TABLE IF NOT EXISTS CARDS (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name text NOT NULL,
-          number text NOT NULL
-        );
-        """;
+    String createCardTable = "CREATE TABLE IF NOT EXISTS cards ("
+        + "id integer PRIMARY KEY,"
+        + "name text NOT NULL,"
+        + "number text NOT NULL"
+        + ");";
 
-    String createItemsTable = """
-        CREATE TABLE IF NOT EXISTS ITEMS (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name text NOT NULL,
-          code text NOT NULL,
-          category text NOT NULL,
-          price DOUBLE NOT NULL,
-          quantity INTEGER NOT NULL
-        );
-        """;
-
-    // need to figure out how to account for anonymous users here (could just be a
-    // default logged in state)
-    // String createOrdersTable = """
-    // CREATE TABLE IF NOT EXISTS ORDERS (
-    // id INTEGER PRIMARY KEY AUTOINCREMENT,
-    // user_id INTEGER NOT NULL,
-    // drink_id INTEGER,
-    // chocolate_id INTEGER,
-    // chip_id INTEGER,
-    // candy_id INTEGER,
-    // FOREIGN KEY (user_id) REFERENCES users(id),
-    // FOREIGN KEY (drink_id) REFERENCES drinks(id),
-    // FOREIGN KEY (chocolate_id) REFERENCES chocolates(id),
-    // FOREIGN KEY (chip_id) REFERENCES chips(id),
-    // FOREIGN KEY (candy_id) REFERENCES candies(id)
-    // );
-    // """;
+    String createItemsTable = "CREATE TABLE IF NOT EXISTS items ("
+        + "id integer PRIMARY KEY,"
+        + "name text NOT NULL,"
+        + "code text NOT NULL,"
+        + "category text NOT NULL,"
+        + "price real NOT NULL,"
+        + "quantity integer NOT NULL"
+        + ");";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
@@ -119,10 +95,7 @@ public class Database {
 
     ArrayList<Card> cards = JsonParser.parseCreditCardFile();
 
-    String insertCard = """
-        INSERT INTO CARDS (name, number)
-        VALUES (?, ?);
-        """;
+    String insertCard = "INSERT INTO CARDS (name, number) VALUES (?, ?);";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
 
@@ -148,10 +121,7 @@ public class Database {
 
   public int insertIntoUsersTable(String account, String password) {
 
-    String insertIntoUsersTable = """
-        INSERT INTO USERS (account, password)
-        VALUES (?, ?);
-        """;
+    String insertIntoUsersTable = "INSERT INTO USERS (account, password) VALUES (?, ?);";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(insertIntoUsersTable)) {
@@ -173,9 +143,7 @@ public class Database {
 
   public ArrayList<User> getAllUsers() {
 
-    String getAllUsers = """
-        SELECT * FROM USERS;
-        """;
+    String getAllUsers = "SELECT * FROM USERS;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
@@ -210,10 +178,7 @@ public class Database {
 
   public int checkUserExists(String account, String password) {
 
-    String checkUserExists = """
-        SELECT * FROM USERS
-        WHERE account = ? AND password = ?;
-        """;
+    String checkUserExists = "SELECT * FROM USERS WHERE account = ? AND password = ?;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(checkUserExists)) {
@@ -244,11 +209,7 @@ public class Database {
 
   public String findUserPassword(String account) {
 
-    String findUserPassword = """
-        SELECT password
-        FROM USERS
-        WHERE account = ?;
-        """;
+    String findUserPassword = "SELECT password FROM USERS WHERE account = ?;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(findUserPassword)) {
@@ -274,9 +235,7 @@ public class Database {
 
   public ArrayList<Card> getAllCards() {
 
-    String getAllCards = """
-        SELECT * FROM CARDS;
-        """;
+    String getAllCards = "SELECT * FROM CARDS;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
@@ -310,10 +269,7 @@ public class Database {
 
   public int insertIntoItemsTable(String name, String code, String category, double price, int quantity) {
 
-    String insertIntoItemsTable = """
-        INSERT INTO ITEMS (name, code, category, price, quantity)
-        VALUES (?, ?, ?, ?, ?);
-        """;
+    String insertIntoItemsTable = "INSERT INTO ITEMS (name, code, category, price, quantity) VALUES (?, ?, ?, ?, ?);";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(insertIntoItemsTable)) {
@@ -346,9 +302,7 @@ public class Database {
 
   public ArrayList<Item> getAllItems() {
 
-    String getAllItems = """
-        SELECT * FROM ITEMS;
-        """;
+    String getAllItems = "SELECT * FROM ITEMS;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
@@ -385,11 +339,7 @@ public class Database {
 
   public int updateItemQuantity(String name, String code, String category, int quantity) {
 
-    String updateItemQuantity = """
-        UPDATE ITEMS
-        SET quantity = ?
-        WHERE name = ? AND code = ? AND category = ?;
-        """;
+    String updateItemQuantity = "UPDATE ITEMS SET quantity = ? WHERE name = ? AND code = ? AND category = ?;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
@@ -413,11 +363,7 @@ public class Database {
 
   public int updateItemPrice(String name, String code, String category, long price) {
 
-    String updateItemPrice = """
-        UPDATE ITEMS
-        SET price = ?
-        WHERE name = ? AND code = ? AND category = ?;
-        """;
+    String updateItemPrice = "UPDATE ITEMS SET price = ? WHERE name = ? AND code = ? AND category = ?;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(updateItemPrice)) {
