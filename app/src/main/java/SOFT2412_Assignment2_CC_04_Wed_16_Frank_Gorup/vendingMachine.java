@@ -1,5 +1,6 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -8,6 +9,8 @@ public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
     Database db;
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public vendingMachine(Database db) {
         this.db = db;
@@ -51,6 +54,17 @@ public class vendingMachine {
         this.db.insertIntoItemsTable("Sour Patch", "SP", "Candies", 5, 12);
         this.db.insertIntoItemsTable("Skittles", "SK", "Candies", 6, 12);
 
+        this.db.insertIntoChangeTable("5c", 10);
+        this.db.insertIntoChangeTable("10c", 10);
+        this.db.insertIntoChangeTable("20c", 10);
+        this.db.insertIntoChangeTable("50c", 10);
+        this.db.insertIntoChangeTable("1", 10);
+        this.db.insertIntoChangeTable("5", 10);
+        this.db.insertIntoChangeTable("10", 10);
+        this.db.insertIntoChangeTable("20", 10);
+        this.db.insertIntoChangeTable("50", 10);
+        this.db.insertIntoChangeTable("100", 10);
+
     }
 
     public void runVendingMachine() {
@@ -58,6 +72,21 @@ public class vendingMachine {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nStarting vending machine...");
+        ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
+
+        if (lastFiveOrders.size() == 0) {
+            System.out.println("\nNo recent orders have been made by anonymous users.\n");
+        } else {
+            System.out.println("\nThe most recent orders made by anonymous users:");
+            System.out.println(
+                    "--------------------------------------------------------------------------------------------------------------------");
+            for (Order order : lastFiveOrders) {
+                System.out.println(order);
+            }
+            System.out.println(
+                    "---------------------------------------------------------------------------------------------------------------------\n");
+        }
+
         System.out.println("What would you like to do? (press help for instructions)");
         System.out.print(">");
 
@@ -84,7 +113,7 @@ public class vendingMachine {
             }
 
             if (input.toLowerCase().startsWith("buyer")) {
-                makePurchase(input);
+                makePurchase(input, sc);
             }
 
             if (input.toLowerCase().startsWith("seller")) {
@@ -114,6 +143,22 @@ public class vendingMachine {
 
             if (input.toLowerCase().equals("exit")) {
                 break;
+            }
+
+            String orderString = this.currentUser == null ? "anonymous users" : "you";
+            lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
+
+            if (lastFiveOrders.size() == 0) {
+                System.out.println("\nThere are no recent orders made by " + orderString);
+            } else {
+                System.out.println("\nThe most recent orders made by " + orderString + " were: ");
+                System.out.println(
+                        "--------------------------------------------------------------------------------------------------------------------");
+                for (Order order : lastFiveOrders) {
+                    System.out.println(order);
+                }
+                System.out.println(
+                        "---------------------------------------------------------------------------------------------------------------------\n");
             }
 
             System.out.println("\nWhat would you like to do? (press help for instructions)");
@@ -201,7 +246,7 @@ public class vendingMachine {
         return exist;
     }
 
-    public void makePurchase(String input) {
+    public void makePurchase(String input, Scanner sc) {
 
         String userInput[] = input.split(" ");
 
@@ -213,14 +258,418 @@ public class vendingMachine {
         }
 
         if (userInput[1].equals("cash")) {
-            // return makeCashPurchase(userInput);
-            return;
+            makeCashPurchase(userInput, sc);
         } else if (userInput[1].equals("card")) {
             makeCardPurchase(userInput);
         } else {
             System.out.println("Invalid payment method!");
             return;
         }
+
+    }
+
+    public void makeCashPurchase(String userInput[], Scanner sc) {
+
+        // buyer cash 3 SP 50c*3,5*3
+
+        int userId = this.currentUser == null ? -1 : this.currentUser.getId();
+
+        if (userInput.length < 5) {
+            System.out.println("Invalid input! Please make sure your input is in the correct format:");
+            System.out.println(
+                    "\tbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]");
+            return;
+        }
+
+        String itemCode = userInput[3];
+        int itemId = this.db.getItemIdByCode(itemCode);
+
+        if (itemId == -1) {
+            System.out.println("The item code provided was invalid. Please list the items to see the item codes.");
+            return;
+        }
+
+        int quantity = Integer.parseInt(userInput[2]);
+        int currentItemQuantity = this.db.getItemQuantityByCode(itemCode);
+
+        if (quantity <= 0) {
+
+            LocalDate date = LocalDate.now();
+            String reason = "Invalid quantity provided";
+
+            this.db.createCancelledOrder(userId, date, reason);
+
+            System.out.println("The order could not be processed. " + reason);
+
+            return;
+
+        }
+
+        if (currentItemQuantity < quantity) {
+
+            LocalDate date = LocalDate.now();
+            String reason = "There was not enough quantity of " + itemCode + " to fulfill the order.";
+
+            this.db.createCancelledOrder(userId, date, reason);
+
+            System.out.println("The order could not be processed. " + reason);
+
+            return;
+
+        }
+
+        double totalCost = this.db.getItemPriceByCode(itemCode) * quantity;
+
+        int fiveCents = 0;
+        int tenCents = 0;
+        int twentyCents = 0;
+        int fiftyCents = 0;
+        int oneDollar = 0;
+        int twoDollars = 0;
+        int fiveDollars = 0;
+        int tenDollars = 0;
+        int twentyDollars = 0;
+        int fiftyDollars = 0;
+        int hundredDollars = 0;
+
+        int[] cash = sumCash(userInput[4].split(","), fiveCents, tenCents, twentyCents, fiftyCents, oneDollar,
+                twoDollars,
+                fiveDollars, tenDollars,
+                twentyDollars, fiftyDollars, hundredDollars);
+
+        if (cash == null) {
+            System.out.println("Invalid cash input Please make sure you are only using valid denominations: ");
+            System.out.println("\t5c, 10c, 20c, 50c, 1, 2, 5, 10, 20, 50, 100");
+            return;
+        }
+
+        fiveCents += cash[0];
+        tenCents += cash[1];
+        twentyCents += cash[2];
+        fiftyCents += cash[3];
+        oneDollar += cash[4];
+        twoDollars += cash[5];
+        fiveDollars += cash[6];
+        tenDollars += cash[7];
+        twentyDollars += cash[8];
+        fiftyDollars += cash[9];
+        hundredDollars += cash[10];
+
+        double totalCash = fiveCents * 0.05 + tenCents * 0.1 + twentyCents * 0.2 + fiftyCents * 0.5 + oneDollar * 1
+                + twoDollars * 2 + fiveDollars * 5 + tenDollars * 10 + twentyDollars * 20 + fiftyDollars * 50
+                + hundredDollars * 100;
+
+        if (totalCash < totalCost) {
+            System.out.println("The total cash you have provided was not enough to cover the cost of the order.");
+            System.out.print("Please enter more cash to meet the cost of the order: ");
+
+            String moreCash = sc.nextLine();
+            String initialCashInput = userInput[4];
+            String newCashInput = initialCashInput + "," + moreCash;
+
+            String newInput = userInput[0] + " " + userInput[1] + " " + userInput[2] + " " + userInput[3] + " "
+                    + newCashInput;
+
+            makeCashPurchase(newInput.split(" "), sc);
+            return;
+
+        }
+
+        // figure out the change
+        double change = calculateChange(totalCash, totalCost, userId);
+
+        if (change >= 0) {
+
+            LocalDate date = LocalDate.now();
+
+            this.db.createOrder(userId, date, itemId, quantity, totalCash, change, "cash");
+        }
+
+    }
+
+    public double calculateChange(double totalCash, double totalCost, int userId) {
+
+        double change = totalCash - totalCost;
+
+        int fiveCents = 0;
+        int tenCents = 0;
+        int twentyCents = 0;
+        int fiftyCents = 0;
+        int oneDollar = 0;
+        int twoDollars = 0;
+        int fiveDollars = 0;
+        int tenDollars = 0;
+        int twentyDollars = 0;
+        int fiftyDollars = 0;
+        int hundredDollars = 0;
+
+        int totalFiveCents = this.db.getAmountOfChangeForDenomination("5c");
+        int totalTenCents = this.db.getAmountOfChangeForDenomination("10c");
+        int totalTwentyCents = this.db.getAmountOfChangeForDenomination("20c");
+        int totalFiftyCents = this.db.getAmountOfChangeForDenomination("50c");
+        int totalOneDollar = this.db.getAmountOfChangeForDenomination("1");
+        int totalTwoDollars = this.db.getAmountOfChangeForDenomination("2");
+        int totalFiveDollars = this.db.getAmountOfChangeForDenomination("5");
+        int totalTenDollars = this.db.getAmountOfChangeForDenomination("10");
+        int totalTwentyDollars = this.db.getAmountOfChangeForDenomination("20");
+        int totalFiftyDollars = this.db.getAmountOfChangeForDenomination("50");
+        int totalHundredDollars = this.db.getAmountOfChangeForDenomination("100");
+
+        boolean skipHundredDollars = false;
+        boolean skipFiftyDollars = false;
+        boolean skipTwentyDollars = false;
+        boolean skipTenDollars = false;
+        boolean skipFiveDollars = false;
+        boolean skipTwoDollars = false;
+        boolean skipOneDollar = false;
+        boolean skipFiftyCents = false;
+        boolean skipTwentyCents = false;
+        boolean skipTenCents = false;
+
+        while (change > 0) {
+
+            // account for floating point precision errors
+            change = Double.parseDouble(df.format(change));
+
+            if (change >= 100 && !skipHundredDollars) {
+
+                if (totalHundredDollars > 0) {
+                    hundredDollars++;
+                    totalHundredDollars--;
+                    change -= 100.00;
+                } else {
+                    skipHundredDollars = true;
+                }
+
+            } else if (change >= 50 && !skipFiftyDollars) {
+
+                if (totalFiftyDollars > 0) {
+                    fiftyDollars++;
+                    totalFiftyDollars--;
+                    change -= 50.00;
+                } else {
+                    skipFiftyDollars = true;
+                }
+
+            } else if (change >= 20 && !skipTwentyDollars) {
+
+                if (totalTwentyDollars > 0) {
+                    twentyDollars++;
+                    totalTwentyDollars--;
+                    change -= 20.00;
+                } else {
+                    skipTwentyDollars = true;
+                }
+
+            } else if (change >= 10 && !skipTenDollars) {
+
+                if (totalTenDollars > 0) {
+                    tenDollars++;
+                    totalTenDollars--;
+                    change -= 10.00;
+                } else {
+                    skipTenDollars = true;
+                }
+
+            } else if (change >= 5 && !skipFiveDollars) {
+
+                if (totalFiveDollars > 0) {
+                    fiveDollars++;
+                    totalFiveDollars--;
+                    change -= 5.00;
+                } else {
+                    skipFiveDollars = true;
+                }
+
+            } else if (change >= 2 && !skipTwoDollars) {
+
+                if (totalTwoDollars > 0) {
+                    twoDollars++;
+                    totalTwoDollars--;
+                    change -= 2.00;
+                } else {
+                    skipTwoDollars = true;
+                }
+
+            } else if (change >= 1 && !skipOneDollar) {
+
+                if (totalOneDollar > 0) {
+                    oneDollar++;
+                    totalOneDollar--;
+                    change -= 1.00;
+                } else {
+                    skipOneDollar = true;
+                }
+
+            } else if (change >= 0.5 && !skipFiftyCents) {
+
+                if (totalFiftyCents > 0) {
+                    fiftyCents++;
+                    totalFiftyCents--;
+                    change -= 0.50;
+                } else {
+                    skipFiftyCents = true;
+                }
+
+            } else if (change >= 0.2 && !skipTwentyCents) {
+
+                if (totalTwentyCents > 0) {
+                    twentyCents++;
+                    totalTwentyCents--;
+                    change -= 0.20;
+                } else {
+                    skipTwentyCents = true;
+                }
+
+            } else if (change >= 0.1 && !skipTenCents) {
+
+                if (totalTenCents > 0) {
+                    tenCents++;
+                    totalTenCents--;
+                    change -= 0.10;
+                } else {
+                    skipTenCents = true;
+                }
+
+            } else if (change >= 0.05) {
+
+                if (totalFiveCents > 0) {
+                    fiveCents++;
+                    totalFiveCents--;
+                    change -= 0.05;
+                } else {
+                    break;
+                }
+
+            } else {
+
+                break;
+
+            }
+
+        }
+
+        if (change > 0) {
+
+            LocalDate date = LocalDate.now();
+            String reason = "Not enough change to perform transaction.";
+
+            this.db.createCancelledOrder(userId, date, reason);
+
+            System.out.println("The order could not be processed. " + reason);
+
+            return -1;
+
+        }
+
+        System.out.println("Order successful!");
+        System.out.println("change " + totalCash + " - " + totalCost + " = " + "$" + (totalCash - totalCost));
+        System.out.print("change breakdown");
+
+        if (hundredDollars > 0) {
+            System.out.print(" ($100 x " + hundredDollars + ") ");
+            this.db.updateChangeForDenomination("100", this.db.getAmountOfChangeForDenomination(
+                    "100") - hundredDollars);
+        }
+        if (fiftyDollars > 0) {
+            System.out.print(" ($50 x " + fiftyDollars + ") ");
+            this.db.updateChangeForDenomination("50", this.db.getAmountOfChangeForDenomination(
+                    "50") - fiftyDollars);
+        }
+        if (twentyDollars > 0) {
+            System.out.print(" ($20 x " + twentyDollars + ") ");
+            this.db.updateChangeForDenomination("20", this.db.getAmountOfChangeForDenomination(
+                    "20") - twentyDollars);
+        }
+        if (tenDollars > 0) {
+            System.out.print(" ($10 x " + tenDollars + ") ");
+            this.db.updateChangeForDenomination("10", this.db.getAmountOfChangeForDenomination(
+                    "10") - tenDollars);
+        }
+        if (fiveDollars > 0) {
+            System.out.print(" ($5 x " + fiveDollars + ") ");
+            this.db.updateChangeForDenomination("5", this.db.getAmountOfChangeForDenomination(
+                    "5") - fiveDollars);
+        }
+        if (twoDollars > 0) {
+            System.out.print(" ($2 x " + twoDollars + ") ");
+            this.db.updateChangeForDenomination("2", this.db.getAmountOfChangeForDenomination(
+                    "2") - twoDollars);
+        }
+        if (oneDollar > 0) {
+            System.out.print(" ($1 x " + oneDollar + ") ");
+            this.db.updateChangeForDenomination("1", this.db.getAmountOfChangeForDenomination(
+                    "1") - oneDollar);
+        }
+        if (fiftyCents > 0) {
+            System.out.print(" (50c x " + fiftyCents + ") ");
+            this.db.updateChangeForDenomination("50c", this.db.getAmountOfChangeForDenomination(
+                    "50c") - fiftyCents);
+        }
+        if (twentyCents > 0) {
+            System.out.print(" (20c x " + twentyCents + ") ");
+            this.db.updateChangeForDenomination("20c", this.db.getAmountOfChangeForDenomination(
+                    "20c") - twentyCents);
+        }
+        if (tenCents > 0) {
+            System.out.print(" (10c x " + tenCents + ") ");
+            this.db.updateChangeForDenomination("10c", this.db.getAmountOfChangeForDenomination(
+                    "10c") - tenCents);
+        }
+        if (fiveCents > 0) {
+            System.out.print(" (5c x " + fiveCents + ") ");
+            this.db.updateChangeForDenomination("5c", this.db.getAmountOfChangeForDenomination(
+                    "5c") - fiveCents);
+        }
+
+        System.out.println();
+
+        return (totalCash - totalCost);
+
+    }
+
+    public int[] sumCash(String[] cashInput, int fiveCents, int tenCents, int twentyCents, int fiftyCents,
+            int oneDollar,
+            int twoDollars, int fiveDollars, int tenDollars, int twentyDollars, int fiftyDollars, int hundredDollars) {
+
+        for (String s : cashInput) {
+
+            String cash[] = s.split("\\*");
+
+            String amount = cash[0];
+            int num = Integer.parseInt(cash[1]);
+
+            if (amount.equals("5c")) {
+                fiveCents += num;
+            } else if (amount.equals("10c")) {
+                tenCents += num;
+            } else if (amount.equals("20c")) {
+                twentyCents += num;
+            } else if (amount.equals("50c")) {
+                fiftyCents += num;
+            } else if (amount.equals("1")) {
+                oneDollar += num;
+            } else if (amount.equals("2")) {
+                twoDollars += num;
+            } else if (amount.equals("5")) {
+                fiveDollars += num;
+            } else if (amount.equals("10")) {
+                tenDollars += num;
+            } else if (amount.equals("20")) {
+                twentyDollars += num;
+            } else if (amount.equals("50")) {
+                fiftyDollars += num;
+            } else if (amount.equals("100")) {
+                hundredDollars += num;
+            } else {
+                return null;
+            }
+
+        }
+
+        int[] cash = { fiveCents, tenCents, twentyCents, fiftyCents, oneDollar, twoDollars, fiveDollars, tenDollars,
+                twentyDollars, fiftyDollars, hundredDollars };
+        return cash;
 
     }
 
@@ -293,6 +742,19 @@ public class vendingMachine {
         int quantity = Integer.parseInt(userInput[2]);
         int currentItemQuantity = this.db.getItemQuantityByCode(itemCode);
 
+        if (quantity <= 0) {
+
+            LocalDate date = LocalDate.now();
+            String reason = "Invalid quantity provided";
+
+            this.db.createCancelledOrder(userId, date, reason);
+
+            System.out.println("The order could not be processed. " + reason);
+
+            return;
+
+        }
+
         if (currentItemQuantity < quantity) {
 
             LocalDate date = LocalDate.now();
@@ -322,7 +784,7 @@ public class vendingMachine {
             return;
         }
 
-        System.out.println("Items dispensed. Thank you for your purchase!");
+        System.out.println("card valid, transaction successful!");
         return;
 
     }
