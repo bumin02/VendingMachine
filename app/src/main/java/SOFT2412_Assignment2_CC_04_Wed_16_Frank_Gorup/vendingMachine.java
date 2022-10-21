@@ -1,9 +1,8 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import java.util.Locale;
 
 public class vendingMachine {
     ArrayList<Item> items;
@@ -12,24 +11,24 @@ public class vendingMachine {
 
     public vendingMachine(Database db) {
         this.db = db;
-        findItems();
 
         // by default, anonymous user
         this.currentUser = null;
+        this.items = new ArrayList<>();
 
         // for setup if needed
         // initialSetup();
     }
 
-    private void findItems() {
-        this.items = this.db.getAllItems();
+    public User getCurrentUser() {
+        return this.currentUser;
     }
 
     // helper function to add items to the vending machine
     public void initialSetup() {
 
         // fake user
-        this.db.insertIntoUsersTable("test", "test");
+        this.db.insertIntoUsersTable("test", "test", "buyer");
 
         // dummy items with quantities and prices defined
         this.db.insertIntoItemsTable("Mineral Water", "MW", "Drinks", 3, 20);
@@ -64,12 +63,32 @@ public class vendingMachine {
 
         while (sc.hasNext()) {
 
-
-
             String input = sc.nextLine();
 
-            if (input.toLowerCase().equals("list")) {
-                this.listOptions("all");
+            if (input.toLowerCase().startsWith("list")) {
+                boolean res = listOptions(input);
+
+                if (!res) {
+                    System.out.println("The category you specified does not exist.");
+                    // todo: show the categories that do exist?
+                }
+
+            }
+
+            if (input.toLowerCase().startsWith("login")) {
+                loginHelper(sc);
+            }
+
+            if (input.toLowerCase().startsWith("register")) {
+                registerHelper(sc);
+            }
+
+            if (input.toLowerCase().startsWith("buyer")) {
+                makePurchase(input);
+            }
+
+            if (input.toLowerCase().startsWith("seller")) {
+
             }
 
             if (input.toLowerCase().equals("help")) {
@@ -97,7 +116,7 @@ public class vendingMachine {
                 break;
             }
 
-            System.out.println("What would you like to do? (press help for instructions)");
+            System.out.println("\nWhat would you like to do? (press help for instructions)");
             System.out.print(">");
         }
 
@@ -105,76 +124,239 @@ public class vendingMachine {
 
     }
 
-    // return false if account exists or invalid input
-    public boolean createAccount(String account, String password) {
+    public void registerHelper(Scanner sc) {
+
+        System.out.print("Enter username: ");
+        String account = sc.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = sc.nextLine();
+
+        if (this.db.getUserByAccountAndPassword(account, password) != null) {
+            System.out.println("User already exists!");
+            return;
+        }
 
         // the result is either 0 (if error) or the new user id
-        int result = this.db.insertIntoUsersTable(account, password);
+        User newUser = this.db.insertIntoUsersTable(account, password, "buyer");
 
-        if (result == 0) {
-
-            System.out.println("Error creating account.");
-            return false;
-
+        if (newUser == null) {
+            System.out.println("Error creating user.");
         } else {
-
             System.out.println("Account successfully created!");
-            User newUser = new User(result, account, password);
             this.currentUser = newUser;
-            return true;
-
         }
 
     }
 
-    // return false if invalid or user and password combination does not exist
-    public boolean login(String account, String password) {
+    public void loginHelper(Scanner sc) {
+
+        System.out.print("Enter username: ");
+        String account = sc.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = sc.nextLine();
 
         // the result is either 0 (if error) or the userId
-        int result = this.db.checkUserExists(account, password);
+        User newUser = this.db.getUserByAccountAndPassword(account, password);
 
-        if (result == 0) {
+        if (newUser == null) {
 
             System.out.println("Invalid username or password!");
-            return false;
 
         } else {
 
-            User user = new User(result, account, password);
-            this.currentUser = user;
-
+            this.currentUser = newUser;
             System.out.println("Successfully logged in!");
-            return true;
 
         }
 
     }
 
-    public User getCurrentUser() {
-        return this.currentUser;
-    }
+    public boolean listOptions(String input) {
 
-    // returns false if no options were found
-    public boolean listOptions(String category) {
+        String categoryInput[] = input.split(" ");
+        String category;
+
+        if (categoryInput.length == 1) {
+            category = "all";
+        } else {
+            category = categoryInput[1];
+        }
+
         boolean exist = false;
-        boolean all = false;
 
-        if (category.toLowerCase(Locale.ROOT).equals("all")) {
-            exist = true;
-            all = true;
-        }
-
-        for (Item i : this.items) {
-            if (all) {
+        for (Item i : this.db.getAllItems()) {
+            if (category.toLowerCase().equals("all")) {
+                exist = true;
                 System.out.println(String.format("+ %s (%s) QTY: %d Price: $%.2f", i.getName(), i.getCode(),
                         i.getQuantity(), i.getPrice()));
-            } else if (i.getCategory().equals(category.toLowerCase(Locale.ROOT))) {
+            } else if (i.getCategory().toLowerCase().equals(category.toLowerCase())) {
                 exist = true;
                 System.out.println(String.format("+ %s (%s) QTY: %d Price: $%.2f", i.getName(), i.getCode(),
                         i.getQuantity(), i.getPrice()));
             }
         }
+
         return exist;
+    }
+
+    public void makePurchase(String input) {
+
+        String userInput[] = input.split(" ");
+
+        if (userInput.length < 4) {
+            System.out.println("Invalid input! Please make sure your input is in the correct format:");
+            System.out.println(
+                    "\tbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]");
+            return;
+        }
+
+        if (userInput[1].equals("cash")) {
+            // return makeCashPurchase(userInput);
+            return;
+        } else if (userInput[1].equals("card")) {
+            makeCardPurchase(userInput);
+        } else {
+            System.out.println("Invalid payment method!");
+            return;
+        }
+
+    }
+
+    public void makeCardPurchase(String userInput[]) {
+
+        // buyer card 4 spr
+        // buyer card 4 spr name number
+        // buyer card 4 SP Sergio 42689
+
+        int userId = this.currentUser == null ? -1 : this.currentUser.getId();
+
+        if (userInput.length == 4 && (userId == -1 || this.currentUser.getCard() == -1)) {
+            System.out.println("You do not have a card stored on file. Please specify one by using the format:");
+            System.out.println("\tbuyer card [Int: QTY] [String: itemName] [String: cardName] [Int: cardNumber]");
+            return;
+        }
+
+        if (userInput.length > 4) {
+
+            if (userInput.length != 6) {
+                System.out.println("Invalid input! Please make sure your input is in the correct format:");
+                System.out.println(
+                        "\tbuyer card [Int: QTY] [String: itemName] [String: cardName] [Int: cardNumber]");
+                return;
+            }
+
+            String cardName = userInput[4];
+            String cardNumber = userInput[5];
+
+            int res;
+
+            if (userId != -1) {
+                res = setUserCard(cardName, cardNumber);
+            } else {
+
+                boolean flag = this.db.checkCardValidity(cardName, cardNumber);
+
+                if (flag) {
+                    res = 1;
+                } else {
+                    res = -2;
+                }
+
+            }
+
+            if (res < 0) {
+
+                LocalDate date = LocalDate.now();
+                String reason = res == -1 ? "There was an error in associating card to user."
+                        : "The card details provided were invalid.";
+
+                this.db.createCancelledOrder(userId, date, reason);
+
+                System.out.println("The order could not be processed. " + reason);
+
+                return;
+
+            }
+
+        }
+
+        String itemCode = userInput[3];
+        int itemId = this.db.getItemIdByCode(itemCode);
+
+        if (itemId == -1) {
+            System.out.println("The item code provided was invalid. Please list the items to see the item codes.");
+            return;
+        }
+
+        int quantity = Integer.parseInt(userInput[2]);
+        int currentItemQuantity = this.db.getItemQuantityByCode(itemCode);
+
+        if (currentItemQuantity < quantity) {
+
+            LocalDate date = LocalDate.now();
+            String reason = "There was not enough quantity of " + itemCode + " to fulfill the order.";
+
+            this.db.createCancelledOrder(userId, date, reason);
+
+            System.out.println("The order could not be processed. " + reason);
+
+            return;
+
+        }
+
+        double totalCost = this.db.getItemPriceByCode(itemCode) * quantity;
+
+        LocalDate date = LocalDate.now();
+        int res = this.db.createOrder(userId, date, itemId, quantity, totalCost, 0, "card");
+
+        if (res < 0) {
+            System.out.println("Error in creating order!");
+            return;
+        }
+
+        // edit quantity of item in db
+        if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
+            System.out.println("Error in updating item quantity!");
+            return;
+        }
+
+        System.out.println("Items dispensed. Thank you for your purchase!");
+        return;
+
+    }
+
+    public int setUserCard(String cardName, String cardNumber) {
+
+        for (Card card : this.db.getAllCards()) {
+
+            if (card.getName().equals(cardName) && card.getNumber().equals(cardNumber)) {
+
+                int res = this.currentUser.associateCardWithUser(card, this.db);
+
+                if (res == -1) {
+                    System.out.println("Error associating card with user.");
+                    return -1;
+                } else if (res == -2) {
+                    System.out.println(
+                            "The card you have provided is invalid. You will not be able to make purchases until you provide a valid card.");
+                    return -2;
+                } else if (res == 2) {
+                    System.out.println(
+                            "The card you have provided is invalid. However, you have an existing card stored on your account. This card will be used for this transaction instead.");
+                    return 2;
+                } else {
+                    System.out.println("Card successfully associated with user.");
+                    return 1;
+                }
+
+            }
+
+        }
+
+        return -1;
+
     }
 
 }
