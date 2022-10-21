@@ -2,11 +2,13 @@ package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
@@ -48,18 +50,19 @@ public class Database {
 
     createDB();
 
-    String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
-        + "id integer PRIMARY KEY,"
-        + "username text NOT NULL,"
-        + "password text NOT NULL,"
-        + "balance real NOT NULL,"
-        + "admin integer NOT NULL"
-        + ");";
-
     String createCardTable = "CREATE TABLE IF NOT EXISTS cards ("
         + "id integer PRIMARY KEY,"
         + "name text NOT NULL,"
         + "number text NOT NULL"
+        + ");";
+
+    String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
+        + "id integer PRIMARY KEY,"
+        + "account text NOT NULL,"
+        + "password text NOT NULL,"
+        + "role text NOT NULL,"
+        + "cardId integer NOT NULL,"
+        + "FOREIGN KEY (cardId) REFERENCES cards (id)"
         + ");";
 
     String createItemsTable = "CREATE TABLE IF NOT EXISTS items ("
@@ -71,12 +74,33 @@ public class Database {
         + "quantity integer NOT NULL"
         + ");";
 
+    String createCancelledOrdersTable = "CREATE TABLE IF NOT EXISTS cancelledOrders ("
+        + "id integer PRIMARY KEY,"
+        + "userId integer NOT NULL,"
+        + "date DATETIME NOT NULL,"
+        + "reason text NOT NULL"
+        + ");";
+
+    String createOrdersTable = "CREATE TABLE IF NOT EXISTS orders ("
+        + "id integer PRIMARY KEY,"
+        + "userId integer NOT NULL,"
+        + "date DATETIME NOT NULL,"
+        + "itemId integer NOT NULL,"
+        + "quantity integer NOT NULL,"
+        + "amountPaid real NOT NULL,"
+        + "returnedChange real NOT NULL,"
+        + "paymentMethod text NOT NULL,"
+        + "FOREIGN KEY (itemId) REFERENCES items (id)"
+        + ");";
+
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
 
       statement.execute(createUsersTable);
       statement.execute(createCardTable);
       statement.execute(createItemsTable);
+      statement.execute(createCancelledOrdersTable);
+      statement.execute(createOrdersTable);
 
       if (getAllCards().isEmpty()) {
         addApprovedCards();
@@ -119,23 +143,115 @@ public class Database {
 
   }
 
-  public int insertIntoUsersTable(String account, String password) {
+  public boolean checkCardValidity(String name, String number) {
 
-    String insertIntoUsersTable = "INSERT INTO USERS (account, password) VALUES (?, ?);";
+    String selectCard = "SELECT * FROM cards WHERE name = ? AND number = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectCard)) {
+
+      statement.setString(1, name);
+      statement.setString(2, number);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+        return true;
+      }
+
+      return false;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return false;
+
+    }
+
+  }
+
+  public int associateCardWithUser(int cardId, int userId) {
+
+    String sql = "UPDATE users SET cardId = ? WHERE id = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(sql)) {
+
+      statement.setInt(1, cardId);
+      statement.setInt(2, userId);
+
+      statement.executeUpdate();
+
+      return 1;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return -1;
+
+    }
+
+  }
+
+  public User insertIntoUsersTable(String account, String password, String role) {
+
+    String insertIntoUsersTable = "INSERT INTO USERS (account, password, role, cardId) VALUES (?, ?, ?, ?);";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(insertIntoUsersTable)) {
 
       statement.setString(1, account);
       statement.setString(2, password);
+      statement.setString(3, role);
+
+      // set default cardInt to -1 when inserting a new user
+      statement.setInt(4, -1);
 
       statement.execute();
-      return 1;
+
+      return getUserByAccountAndPassword(account, password);
 
     } catch (SQLException e) {
 
       System.out.println(e.getMessage());
-      return 0;
+      return null;
+
+    }
+
+  }
+
+  public User getUserByAccountAndPassword(String account, String pwd) {
+
+    String selectUser = "SELECT * FROM users WHERE account = ? AND password = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectUser)) {
+
+      statement.setString(1, account);
+      statement.setString(2, pwd);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+
+        int id = result.getInt("id");
+        String password = result.getString("password");
+        String role = result.getString("role");
+        int cardId = result.getInt("cardId");
+
+        return new User(id, account, password, role, cardId);
+
+      }
+
+      return null;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return null;
 
     }
 
@@ -158,71 +274,16 @@ public class Database {
         int id = rs.getInt("id");
         String account = rs.getString("account");
         String password = rs.getString("password");
+        String role = rs.getString("role");
+        int cardId = rs.getInt("cardId");
 
-        User user = new User(id, account, password);
+        User user = new User(id, account, password, role, cardId);
 
         users.add(user);
 
       }
 
       return users;
-
-    } catch (SQLException e) {
-
-      System.out.println(e.getMessage());
-      return null;
-
-    }
-
-  }
-
-  public int checkUserExists(String account, String password) {
-
-    String checkUserExists = "SELECT * FROM USERS WHERE account = ? AND password = ?;";
-
-    try (Connection conn = DriverManager.getConnection(dbURL);
-        PreparedStatement statement = conn.prepareStatement(checkUserExists)) {
-
-      statement.setString(1, account);
-      statement.setString(2, password);
-
-      ResultSet rs = statement.executeQuery();
-
-      if (rs.next()) {
-
-        return rs.getInt("id");
-
-      } else {
-
-        return 0;
-
-      }
-
-    } catch (SQLException e) {
-
-      System.out.println(e.getMessage());
-      return -1;
-
-    }
-
-  }
-
-  public String findUserPassword(String account) {
-
-    String findUserPassword = "SELECT password FROM USERS WHERE account = ?;";
-
-    try (Connection conn = DriverManager.getConnection(dbURL);
-        PreparedStatement statement = conn.prepareStatement(findUserPassword)) {
-
-      statement.setString(1, account);
-
-      ResultSet rs = statement.executeQuery();
-
-      if (rs.next()) {
-        return rs.getString("password");
-      }
-
-      return null;
 
     } catch (SQLException e) {
 
@@ -250,7 +311,7 @@ public class Database {
         String number = rs.getString("number");
         String name = rs.getString("name");
 
-        Card card = new Card(number, name);
+        Card card = new Card(name, number);
 
         cards.add(card);
 
@@ -287,6 +348,99 @@ public class Database {
 
       if (rs.next()) {
         return rs.getInt(1);
+      }
+
+      return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public int getItemIdByCode(String code) {
+
+    String selectItem = "SELECT * FROM items WHERE code = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectItem)) {
+
+      statement.setString(1, code);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+
+        int id = result.getInt("id");
+
+        return id;
+
+      }
+
+      return -1;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return -1;
+
+    }
+
+  }
+
+  public double getItemPriceByCode(String code) {
+
+    String selectItem = "SELECT * FROM items WHERE code = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectItem)) {
+
+      statement.setString(1, code);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+
+        double price = result.getDouble("price");
+
+        return price;
+
+      }
+
+      return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public int getItemQuantityByCode(String code) {
+
+    String selectItem = "SELECT * FROM items WHERE code = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectItem)) {
+
+      statement.setString(1, code);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+
+        int quantity = result.getInt("quantity");
+
+        return quantity;
+
       }
 
       return 0;
@@ -337,20 +491,19 @@ public class Database {
 
   }
 
-  public int updateItemQuantity(String name, String code, String category, int quantity) {
+  public int updateItemQuantity(int itemId, int newQuantity) {
 
-    String updateItemQuantity = "UPDATE ITEMS SET quantity = ? WHERE name = ? AND code = ? AND category = ?;";
+    String updateItemQuantity = "UPDATE items SET quantity = ? WHERE id = ?;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
 
-      statement.setInt(1, quantity);
-      statement.setString(2, name);
-      statement.setString(3, code);
-      statement.setString(4, category);
+      statement.setInt(1, newQuantity);
+      statement.setInt(2, itemId);
 
       statement.execute();
-      return 1;
+
+      return itemId;
 
     } catch (SQLException e) {
 
@@ -361,20 +514,63 @@ public class Database {
 
   }
 
-  public int updateItemPrice(String name, String code, String category, long price) {
+  public int createCancelledOrder(int userId, LocalDate date, String reason) {
 
-    String updateItemPrice = "UPDATE ITEMS SET price = ? WHERE name = ? AND code = ? AND category = ?;";
+    String insertIntoCancelledOrdersTable = "INSERT INTO cancelledOrders (userId, date, reason) VALUES (?, ?, ?);";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
-        PreparedStatement statement = conn.prepareStatement(updateItemPrice)) {
+        PreparedStatement statement = conn.prepareStatement(insertIntoCancelledOrdersTable)) {
 
-      statement.setLong(1, price);
-      statement.setString(2, name);
-      statement.setString(3, code);
-      statement.setString(4, category);
+      statement.setInt(1, userId);
+      statement.setString(2, date.toString());
+      statement.setString(3, reason);
 
       statement.execute();
-      return 1;
+
+      // return the userId
+      ResultSet rs = statement.getGeneratedKeys();
+
+      if (rs.next()) {
+        return rs.getInt(1);
+      }
+
+      return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public int createOrder(int userId, LocalDate date, int itemId, int quantity, double amountPaid, double returnedChange,
+      String paymentMethod) {
+
+    String insertIntoOrdersTable = "INSERT INTO orders (userId, date, itemId, quantity, amountPaid, returnedChange, paymentMethod) VALUES (?, ?, ?, ?, ?, ?, ?);";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(insertIntoOrdersTable)) {
+
+      statement.setInt(1, userId);
+      statement.setString(2, date.toString());
+      statement.setInt(3, itemId);
+      statement.setInt(4, quantity);
+      statement.setDouble(5, amountPaid);
+      statement.setDouble(6, returnedChange);
+      statement.setString(7, paymentMethod);
+
+      statement.execute();
+
+      // return the userId
+      ResultSet rs = statement.getGeneratedKeys();
+
+      if (rs.next()) {
+        return rs.getInt(1);
+      }
+
+      return 0;
 
     } catch (SQLException e) {
 
