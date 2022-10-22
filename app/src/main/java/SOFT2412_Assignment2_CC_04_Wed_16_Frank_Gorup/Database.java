@@ -93,6 +93,12 @@ public class Database {
         + "FOREIGN KEY (itemId) REFERENCES items (id)"
         + ");";
 
+    String createChangeTable = "CREATE TABLE IF NOT EXISTS change ("
+        + "id integer PRIMARY KEY,"
+        + "denomination text NOT NULL,"
+        + "quantity integer NOT NULL"
+        + ");";
+
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
 
@@ -101,6 +107,7 @@ public class Database {
       statement.execute(createItemsTable);
       statement.execute(createCancelledOrdersTable);
       statement.execute(createOrdersTable);
+      statement.execute(createChangeTable);
 
       if (getAllCards().isEmpty()) {
         addApprovedCards();
@@ -571,6 +578,131 @@ public class Database {
       }
 
       return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public ArrayList<Order> getFiveMostRecentOrders(int userId) {
+
+    String getFiveMostRecentOrders = "SELECT * FROM orders WHERE userId = ? ORDER BY date DESC LIMIT 5;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(getFiveMostRecentOrders)) {
+
+      statement.setInt(1, userId);
+
+      ResultSet rs = statement.executeQuery();
+
+      ArrayList<Order> orders = new ArrayList<>();
+
+      // create a list of orders from the result set
+      while (rs.next()) {
+
+        int id = rs.getInt("id");
+        LocalDate date = LocalDate.parse(rs.getString("date"));
+        int itemId = rs.getInt("itemId");
+        int quantity = rs.getInt("quantity");
+        double amountPaid = rs.getDouble("amountPaid");
+        double returnedChange = rs.getDouble("returnedChange");
+        String paymentMethod = rs.getString("paymentMethod");
+
+        Order order = new Order(id, userId, date, itemId, quantity, amountPaid, returnedChange, paymentMethod);
+
+        orders.add(order);
+
+      }
+
+      return orders;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return null;
+
+    }
+
+  }
+
+  public int insertIntoChangeTable(String denomination, int quantity) {
+
+    String insertIntoChangeTable = "INSERT INTO change (denomination, quantity) VALUES (?, ?);";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(insertIntoChangeTable)) {
+
+      statement.setString(1, denomination);
+      statement.setInt(2, quantity);
+
+      statement.execute();
+
+      // return the userId
+      ResultSet rs = statement.getGeneratedKeys();
+
+      if (rs.next()) {
+        return rs.getInt(1);
+      }
+
+      return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public int getAmountOfChangeForDenomination(String denomination) {
+
+    String selectItem = "SELECT * FROM change WHERE denomination = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+
+        PreparedStatement statement = conn.prepareStatement(selectItem)) {
+
+      statement.setString(1, denomination);
+
+      ResultSet result = statement.executeQuery();
+
+      if (result.next()) {
+
+        int quantity = result.getInt("quantity");
+
+        return quantity;
+
+      }
+
+      return 0;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public int updateChangeForDenomination(String denomination, int newQuantity) {
+
+    String updateItemQuantity = "UPDATE change SET quantity = ? WHERE denomination = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
+
+      statement.setInt(1, newQuantity);
+      statement.setString(2, denomination);
+
+      statement.execute();
+
+      return newQuantity;
 
     } catch (SQLException e) {
 

@@ -72,4 +72,22 @@ public class User {
 
     }
 
+    public boolean hasSellerPermissions() {
+
+        return this.role.equals("seller") || this.role.equals("owner");
+
+    }
+
+    public boolean hasCashierPermissions() {
+
+        return this.role.equals("cashier") || this.role.equals("owner");
+
+    }
+
+    public boolean hasOwnerPermissions() {
+
+        return this.role.equals("owner");
+
+    }
+
 }
