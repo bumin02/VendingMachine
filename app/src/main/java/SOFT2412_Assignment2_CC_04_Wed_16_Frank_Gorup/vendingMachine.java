@@ -564,6 +564,11 @@ public class vendingMachine {
 
         System.out.println("Order successful!");
         System.out.println("change " + totalCash + " - " + totalCost + " = " + "$" + (totalCash - totalCost));
+
+        if (change == 0) {
+            return 0;
+        }
+
         System.out.print("change breakdown");
 
         if (hundredDollars > 0) {
