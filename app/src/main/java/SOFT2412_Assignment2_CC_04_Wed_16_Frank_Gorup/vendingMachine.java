@@ -68,11 +68,14 @@ public class vendingMachine {
     }
 
     public void runVendingMachine() {
-
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nStarting vending machine...");
         ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
+
+        String orderString = this.currentUser == null ? "anonymous users" : "you";
+        lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
+
 
         if (lastFiveOrders.size() == 0) {
             System.out.println("\nNo recent orders have been made by anonymous users.\n");
@@ -117,7 +120,7 @@ public class vendingMachine {
             }
 
             if (input.toLowerCase().startsWith("seller")) {
-
+                System.out.println(input);
             }
 
             if (input.toLowerCase().equals("help")) {
@@ -145,28 +148,31 @@ public class vendingMachine {
                 break;
             }
 
-            String orderString = this.currentUser == null ? "anonymous users" : "you";
-            lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
-
-            if (lastFiveOrders.size() == 0) {
-                System.out.println("\nThere are no recent orders made by " + orderString);
-            } else {
-                System.out.println("\nThe most recent orders made by " + orderString + " were: ");
-                System.out.println(
-                        "--------------------------------------------------------------------------------------------------------------------");
-                for (Order order : lastFiveOrders) {
-                    System.out.println(order);
-                }
-                System.out.println(
-                        "---------------------------------------------------------------------------------------------------------------------\n");
-            }
-
             System.out.println("\nWhat would you like to do? (press help for instructions)");
             System.out.print(">");
         }
 
         sc.close();
 
+    }
+
+    public int cashReplenishment(String denomination, int quantity) {
+        if (quantity < 0) {
+            System.out.println("quantity cannot be negative.");
+            return 0;
+        }
+
+        if (db.getAmountOfChangeForDenomination(denomination) == 0) {
+            System.out.println("cash denomination does not exist.");
+            return 0;
+        }
+
+        if (db.insertIntoChangeTable(denomination, quantity) == 0) {
+            return 0;
+        } else {
+            System.out.println("SUCCESS");
+            return 1;
+        }
     }
 
     public void registerHelper(Scanner sc) {
