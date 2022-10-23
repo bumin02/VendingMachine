@@ -5,38 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6afe8968-989c-476d-9d56-d036ef256b8a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/google-java-format.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Group-3-.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Card.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/History.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/JsonParser.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/User.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/vendingMachine.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/test/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/testVendingMachine.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Card.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/History.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/JsonParser.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/vendingMachine.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/test/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/testVendingMachine.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json-simple-1.1.1.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/App.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Items.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Items.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/test/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/AppTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Items.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Items.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/AppTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/Database.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/vendingMachine.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup/vendingMachine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vendingMachine.db" beforeDir="false" afterPath="$PROJECT_DIR$/app/vendingMachine.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

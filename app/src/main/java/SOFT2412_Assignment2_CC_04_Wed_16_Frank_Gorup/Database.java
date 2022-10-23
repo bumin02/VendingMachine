@@ -71,7 +71,7 @@ public class Database {
         + "code text NOT NULL,"
         + "category text NOT NULL,"
         + "price real NOT NULL,"
-        + "quantity integer NOT NULL"
+        + "quantity integer NOT NULL CHECK (quantity > 0)"
         + ");";
 
     String createCancelledOrdersTable = "CREATE TABLE IF NOT EXISTS cancelledOrders ("
@@ -86,7 +86,7 @@ public class Database {
         + "userId integer NOT NULL,"
         + "date DATETIME NOT NULL,"
         + "itemId integer NOT NULL,"
-        + "quantity integer NOT NULL,"
+        + "quantity INT unsigned NOT NULL, "
         + "amountPaid real NOT NULL,"
         + "returnedChange real NOT NULL,"
         + "paymentMethod text NOT NULL,"
@@ -96,7 +96,7 @@ public class Database {
     String createChangeTable = "CREATE TABLE IF NOT EXISTS change ("
         + "id integer PRIMARY KEY,"
         + "denomination text NOT NULL,"
-        + "quantity integer NOT NULL"
+        + "quantity INT unsigned NOT NULL"
         + ");";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
@@ -652,7 +652,7 @@ public class Database {
 
     } catch (SQLException e) {
 
-      System.out.println(e.getMessage());
+      System.out.println("Unable to proceed with the given data. Please check your input.");
       return 0;
 
     }
