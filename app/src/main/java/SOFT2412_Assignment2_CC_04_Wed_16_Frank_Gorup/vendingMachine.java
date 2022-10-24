@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import java.util.Arrays;
 public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
@@ -120,6 +120,43 @@ public class vendingMachine {
             }
 
             if (input.toLowerCase().startsWith("seller")) {
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 5){
+                    System.out.println("Missing inputs. Please try again.");
+                    break;
+                }
+                if (inputList[1].equals("modify")){
+                    String toModify = inputList[2];
+                    String item = inputList[3];
+                    String[] newArray = Arrays.copyOfRange(inputList, 4, inputList.length);
+                    //String changeInto = inputList[4];
+                    if (toModify.equals("qty")){
+                        db.sellerModifyQuantity(toModify, item, newArray[0]);
+                    }
+                    if (toModify.equals("name")){
+                        db.sellderModifyName(toModify, item, newArray);;
+                    }
+                    if (toModify.equals("category")){
+                        db.sellderModifyCategory(toModify, item, newArray);;
+                    }
+                    if (toModify.equals("code")){
+                        if(newArray.length > 1){
+                            System.out.println("Invalid input, code must be one word");
+                        }
+                        else{
+                            db.sellderModifyCode(toModify, item, newArray[0]);;
+                        }
+                    }
+                    if (toModify.equals("price")){
+                        if(newArray.length > 1){
+                            System.out.println("Invalid input, please only input 1 price");
+                        }
+                        else{
+                            db.sellderModifyPrice(toModify, item, newArray[0]);;
+                        }
+                    }
+                    
+                }
                 System.out.println(input);
             }
 
