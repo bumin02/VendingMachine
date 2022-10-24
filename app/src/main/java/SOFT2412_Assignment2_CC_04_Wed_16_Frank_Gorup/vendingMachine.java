@@ -4,11 +4,14 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
     Database db;
+    static Timer timer;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -93,8 +96,18 @@ public class vendingMachine {
         System.out.println("What would you like to do? (type help for instructions, exit to quit)");
         System.out.print("> ");
 
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("You have been logged out due to inactivity.");
+                System.exit(0);
+            }
+        }, 120000);
+
         while (sc.hasNext()) {
 
+            timer.cancel();
             String input = sc.nextLine();
 
             if (input.toLowerCase().startsWith("list")) {
@@ -130,6 +143,15 @@ public class vendingMachine {
             if (input.toLowerCase().equals("exit")) {
                 break;
             }
+            
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.out.println("You have been logged out due to inactivity.");
+                    System.exit(0);
+                }
+            }, 120000);
 
             System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
             System.out.print("> ");
