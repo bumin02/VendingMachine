@@ -20,7 +20,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-        // initialSetup();
+        initialSetup();
     }
 
     public User getCurrentUser() {
@@ -34,25 +34,25 @@ public class vendingMachine {
         this.db.insertIntoUsersTable("test", "test", "buyer");
 
         // dummy items with quantities and prices defined
-        this.db.insertIntoItemsTable("Mineral Water", "MW", "Drinks", 3, 20);
-        this.db.insertIntoItemsTable("Sprite", "SP", "Drinks", 5, 10);
-        this.db.insertIntoItemsTable("Coca Cola", "CC", "Drinks", 5, 10);
-        this.db.insertIntoItemsTable("Pepsi", "PE", "Drinks", 4, 10);
-        this.db.insertIntoItemsTable("Juice", "JU", "Drinks", 3.5, 10);
+        this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
+        this.db.insertIntoItemsTable("sprite", "sp", "drinks", 5, 10);
+        this.db.insertIntoItemsTable("coca cola", "cc", "drinks", 5, 10);
+        this.db.insertIntoItemsTable("pepsi", "pe", "drinks", 4, 10);
+        this.db.insertIntoItemsTable("juice", "ju", "drinks", 3.5, 10);
 
-        this.db.insertIntoItemsTable("Mars", "MA", "Chocolates", 5, 12);
-        this.db.insertIntoItemsTable("M&M", "MM", "Chocolates", 6, 12);
-        this.db.insertIntoItemsTable("Bounty", "BO", "Chocolates", 5, 12);
-        this.db.insertIntoItemsTable("Snickers", "SN", "Chocolates", 7, 12);
+        this.db.insertIntoItemsTable("mars", "ma", "chocolates", 5, 12);
+        this.db.insertIntoItemsTable("m&m", "mm", "chocolates", 6, 12);
+        this.db.insertIntoItemsTable("bounty", "bo", "chocolates", 5, 12);
+        this.db.insertIntoItemsTable("snickers", "sn", "chocolates", 7, 12);
 
-        this.db.insertIntoItemsTable("Smiths", "SM", "Chips", 5, 10);
-        this.db.insertIntoItemsTable("Pringles", "PR", "Chips", 6, 10);
-        this.db.insertIntoItemsTable("Kettle", "KE", "Chips", 5, 10);
-        this.db.insertIntoItemsTable("Thins", "TH", "Chips", 4, 10);
+        this.db.insertIntoItemsTable("smiths", "sm", "chips", 5, 10);
+        this.db.insertIntoItemsTable("pringles", "pr", "chips", 6, 10);
+        this.db.insertIntoItemsTable("kettle", "ke", "chips", 5, 10);
+        this.db.insertIntoItemsTable("thins", "th", "chips", 4, 10);
 
-        this.db.insertIntoItemsTable("Mentos", "ME", "Candies", 3, 15);
-        this.db.insertIntoItemsTable("Sour Patch", "SP", "Candies", 5, 12);
-        this.db.insertIntoItemsTable("Skittles", "SK", "Candies", 6, 12);
+        this.db.insertIntoItemsTable("mentos", "me", "candies", 3, 15);
+        this.db.insertIntoItemsTable("sour patch", "sp", "candies", 5, 12);
+        this.db.insertIntoItemsTable("skittles", "sk", "candies", 6, 12);
 
         this.db.insertIntoChangeTable("5c", 10);
         this.db.insertIntoChangeTable("10c", 10);
