@@ -7,6 +7,8 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Arrays;
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
 
 public class vendingMachine {
     ArrayList<Item> items;
@@ -198,6 +200,49 @@ public class vendingMachine {
 
     }
 
+    public void getSellerReport() {
+        try {
+            FileWriter myWriter = new FileWriter("reports/availableItems.txt");
+            ArrayList<Item> items = db.getAllItems();
+
+            for (Item i: items) {
+                String message = String.format("%s (%s): category: %s, price: %s, quantity: %s\r\n",i.getName(), i.getCode(), i.getCategory(), i.getPrice(), i.getQuantity());
+                myWriter.write(message);
+            }
+
+            myWriter.close();
+
+            FileWriter summary = new FileWriter("reports/summary.txt");
+            ArrayList<Order> orders = db.getOrders();
+
+            if (orders == null) {
+                for (Item i: items) {
+                    String message = String.format("%s (%s) | quantity sold 0\r\n",i.getName(), i.getCode());
+                    summary.write(message);
+                }
+                return;
+            }
+
+            for (Item i: items) {
+                int quant = 0;
+                for (Order o: orders) {
+                    if (o.getItemId()== i.getId()) {
+                        quant += o.getQuantity();
+                    }
+                }
+
+                String message = String.format("%s (%s) | quantity sold %s\n",i.getName(), i.getCode(), quant);
+                summary.write(message);
+            }
+
+            summary.close();
+            System.out.println("check availableItems.txt and summary.txt for reports");
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
+    }
+
     public int cashReplenishment(String denomination, int quantity) {
         if (quantity < 0) {
             System.out.println("quantity cannot be negative.");
@@ -251,7 +296,8 @@ public class vendingMachine {
         String password = sc.nextLine();
 
         // the result is either 0 (if error) or the userId
-        User newUser = this.db.getUserByAccountAndPassword(account, password);
+        User newUser = null;
+        newUser = this.db.getUserByAccountAndPassword(account, password);
 
         if (newUser == null) {
 
@@ -262,9 +308,14 @@ public class vendingMachine {
             this.currentUser = newUser;
             System.out.println("Successfully logged in!");
 
+            if (this.currentUser.hasSellerPermissions()) {
+                getSellerReport();
+            }
+
         }
 
     }
+
 
     public boolean listOptions(String input) {
 

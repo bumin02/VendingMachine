@@ -462,7 +462,7 @@ public class Database {
 
   public ArrayList<Item> getAllItems() {
 
-    String getAllItems = "SELECT * FROM ITEMS;";
+    String getAllItems = "SELECT * FROM ITEMS ORDER BY id ASC;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         Statement statement = conn.createStatement()) {
@@ -479,9 +479,9 @@ public class Database {
         String category = rs.getString("category");
         double price = rs.getDouble("price");
         int quantity = rs.getInt("quantity");
+        int id = rs.getInt("id");
 
-        Item item = new Item(name, code, category, price, quantity);
-
+        Item item = new Item(id, name, code, category, price, quantity);
         items.add(item);
 
       }
@@ -886,9 +886,11 @@ public class Database {
     }
   }
 
+ 
+
   public ArrayList<Order> getOrders() {
     ArrayList<Order> orders = new ArrayList<Order>();
-    String selectOrders = "SELECT * FROM orders;";
+    String selectOrders = "SELECT * FROM orders ORDER BY itemId ASC;";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
         PreparedStatement statement = conn.prepareStatement(selectOrders)) {

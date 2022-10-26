@@ -6,13 +6,15 @@ public class Item {
     String category;
     double price;
     int quantity;
+    int id;
 
-    public Item(String name, String code, String category, double price, int quantity) {
+    public Item(int id, String name, String code, String category, double price, int quantity) {
         this.name = name;
         this.code = code;
         this.category = category;
         this.price = price;
         this.quantity = quantity;
+        this.id = id;
     }
 
     public String getName() {
@@ -33,6 +35,10 @@ public class Item {
 
     public double getPrice() {
         return this.price;
+    }
+
+    public int getId() {
+        return this.id;
     }
 
 }
