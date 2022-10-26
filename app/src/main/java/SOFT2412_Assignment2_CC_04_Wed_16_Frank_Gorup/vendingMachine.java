@@ -24,7 +24,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-        // initialSetup();
+       //initialSetup();
     }
 
     public User getCurrentUser() {
@@ -166,7 +166,6 @@ public class vendingMachine {
                             System.out.println("Invalid input, please only input 1 price");
                         } else {
                             db.sellderModifyPrice(toModify, item, newArray[0]);
-                            ;
                         }
                     }
 
@@ -353,7 +352,7 @@ public class vendingMachine {
             System.out.println(
                     "\n----------------------------------------------------HELP SELLER----------------------------------------------------");
             System.out.println(
-                    "\nseller modify [String: itemName] [String: ItemCode] [Int: QTY] [Int: ItemPrice] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty coke 10\n            Success!\n");
+                    "\nseller modify [String: itemName] [String: ItemCode] [Int: QTY] [Int: ItemPrice] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
             System.out.println(
                     "\nseller list [String: filetype]: Provides the seller with either a csv or txt file for the list of current items.\n    Example:\n    > seller list txt\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
             System.out.println(
