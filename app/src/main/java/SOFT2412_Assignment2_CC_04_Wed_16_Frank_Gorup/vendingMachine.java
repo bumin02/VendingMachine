@@ -7,6 +7,7 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Arrays;
+
 public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
@@ -23,7 +24,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-        //initialSetup();
+        // initialSetup();
     }
 
     public User getCurrentUser() {
@@ -76,9 +77,7 @@ public class vendingMachine {
         System.out.println("\nStarting vending machine...");
         ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
 
-        String orderString = this.currentUser == null ? "anonymous users" : "you";
         lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
-
 
         if (lastFiveOrders.size() == 0) {
             System.out.println("\nNo recent orders have been made by anonymous users.\n");
@@ -103,7 +102,7 @@ public class vendingMachine {
                 System.out.println("You have been logged out due to inactivity.");
                 System.exit(0);
             }
-        }, 120000);
+        }, 5000);
 
         while (sc.hasNext()) {
 
@@ -115,7 +114,6 @@ public class vendingMachine {
 
                 if (!res) {
                     System.out.println("The category you specified does not exist.");
-                    // todo: show the categories that do exist?
                 }
 
             }
@@ -133,45 +131,47 @@ public class vendingMachine {
             }
 
             if (input.toLowerCase().startsWith("seller")) {
-              
+
                 String[] inputList = input.toLowerCase().split(" ");
-                if (inputList.length < 5){
+                if (inputList.length < 5) {
                     System.out.println("Missing inputs. Please try again.");
                     break;
                 }
-                if (inputList[1].equals("modify")){
+                if (inputList[1].equals("modify")) {
                     String toModify = inputList[2];
                     String item = inputList[3];
                     String[] newArray = Arrays.copyOfRange(inputList, 4, inputList.length);
-                    //String changeInto = inputList[4];
-                    if (toModify.equals("qty")){
+                    // String changeInto = inputList[4];
+                    if (toModify.equals("qty")) {
                         db.sellerModifyQuantity(toModify, item, newArray[0]);
                     }
-                    if (toModify.equals("name")){
-                        db.sellerModifyName(toModify, item, newArray);;
+                    if (toModify.equals("name")) {
+                        db.sellerModifyName(toModify, item, newArray);
+                        ;
                     }
-                    if (toModify.equals("category")){
-                        db.sellderModifyCategory(toModify, item, newArray);;
+                    if (toModify.equals("category")) {
+                        db.sellderModifyCategory(toModify, item, newArray);
+                        ;
                     }
-                    if (toModify.equals("code")){
-                        if(newArray.length > 1){
+                    if (toModify.equals("code")) {
+                        if (newArray.length > 1) {
                             System.out.println("Invalid input, code must be one word");
-                        }
-                        else{
-                            db.sellderModifyCode(toModify, item, newArray[0]);;
+                        } else {
+                            db.sellderModifyCode(toModify, item, newArray[0]);
+                            ;
                         }
                     }
-                    if (toModify.equals("price")){
-                        if(newArray.length > 1){
+                    if (toModify.equals("price")) {
+                        if (newArray.length > 1) {
                             System.out.println("Invalid input, please only input 1 price");
-                        }
-                        else{
-                            db.sellderModifyPrice(toModify, item, newArray[0]);;
+                        } else {
+                            db.sellderModifyPrice(toModify, item, newArray[0]);
+                            ;
                         }
                     }
-                    
+
                 }
-              
+
             }
 
             if (input.toLowerCase().startsWith("help")) {
@@ -181,7 +181,7 @@ public class vendingMachine {
             if (input.toLowerCase().equals("exit")) {
                 break;
             }
-            
+
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -189,7 +189,7 @@ public class vendingMachine {
                     System.out.println("You have been logged out due to inactivity.");
                     System.exit(0);
                 }
-            }, 120000);
+            }, 5000);
 
             System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
             System.out.print("> ");
@@ -364,7 +364,6 @@ public class vendingMachine {
             System.out.println("Invalid command. Please try again.");
         }
 
-
     }
 
     public void makePurchase(String input, Scanner sc) {
@@ -503,7 +502,19 @@ public class vendingMachine {
 
             LocalDate date = LocalDate.now();
 
-            this.db.createOrder(userId, date, itemId, quantity, totalCash, change, "cash");
+            int res = this.db.createOrder(userId, date, itemId, quantity, totalCash, change, "cash");
+
+            if (res < 0) {
+                System.out.println("Error in creating order!");
+                return;
+            }
+
+            // edit quantity of item in db
+            if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
+                System.out.println("Error in updating item quantity!");
+                return;
+            }
+
         }
 
     }
