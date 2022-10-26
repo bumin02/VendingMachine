@@ -120,6 +120,7 @@ public class vendingMachine {
             }
 
             if (input.toLowerCase().startsWith("seller")) {
+              
                 String[] inputList = input.toLowerCase().split(" ");
                 if (inputList.length < 5){
                     System.out.println("Missing inputs. Please try again.");
@@ -157,6 +158,7 @@ public class vendingMachine {
                     }
                     
                 }
+              
                 System.out.println(input);
             }
 
@@ -198,6 +200,7 @@ public class vendingMachine {
             System.out.println("quantity cannot be negative.");
             return 0;
         }
+
         if (db.getAmountOfChangeForDenomination(denomination) == 0) {
             System.out.println("cash denomination does not exist.");
             return 0;
