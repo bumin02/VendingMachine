@@ -717,7 +717,12 @@ public class Database {
       int itemCode = getItemIdByCode(item.toLowerCase());
       try{
           int qty = Integer.parseInt(changeInto);
-          updateItemQuantity(itemCode, qty);
+          int res = updateItemQuantity(itemCode, qty);
+          if (res > 0) {
+            System.out.println("Item quantity updated successfully");
+          } else {
+            System.out.println("Unable to update item quantity");
+          }
       }catch (NumberFormatException e){
         System.out.println("Invalid quantity");
         return;
@@ -808,7 +813,12 @@ public class Database {
       StringBuilder sb = new StringBuilder(fullCategory);
       sb.deleteCharAt(sb.length()-1);
       String finalFullCategory = sb.toString();
-      updateItemCategory(itemCode, finalFullCategory);
+      int res = updateItemCategory(itemCode, finalFullCategory);
+      if (res > 0) {
+        System.out.println("Item category updated successfully");
+      } else {
+        System.out.println("Unable to update item category");
+      }
   }
 
   public int updateItemCode(int itemId, String newCode) {
@@ -836,7 +846,12 @@ public class Database {
 
   public void sellderModifyCode(String toModify, String item, String Code){
     int itemCode = getItemIdByCode(item.toLowerCase());
-    updateItemCode(itemCode, Code);
+    int res = updateItemCode(itemCode, Code);
+    if (res > 0) {
+      System.out.println("Item code updated successfully");
+    } else {
+      System.out.println("Unable to update item code");
+    }
   }
 
   public int updateItemPrice(int itemId, String newPrice) {
@@ -864,7 +879,12 @@ public class Database {
 
   public void sellderModifyPrice(String toModify, String item, String Price){
     int itemCode = getItemIdByCode(item.toLowerCase());
-    updateItemPrice(itemCode, Price);
+    int res = updateItemPrice(itemCode, Price);
+    if (res > 0) {
+      System.out.println("Item price updated successfully");
+    } else {
+      System.out.println("Unable to update item price");
+    }
   }
 
 }

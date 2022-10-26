@@ -166,7 +166,6 @@ public class vendingMachine {
                             System.out.println("Invalid input, please only input 1 price");
                         } else {
                             db.sellderModifyPrice(toModify, item, newArray[0]);
-                            ;
                         }
                     }
 
