@@ -24,7 +24,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-        // initialSetup();
+        initialSetup();
     }
 
     public User getCurrentUser() {
