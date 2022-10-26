@@ -102,7 +102,7 @@ public class vendingMachine {
                 System.out.println("You have been logged out due to inactivity.");
                 System.exit(0);
             }
-        }, 5000);
+        }, 120000);
 
         while (sc.hasNext()) {
 
@@ -189,7 +189,7 @@ public class vendingMachine {
                     System.out.println("You have been logged out due to inactivity.");
                     System.exit(0);
                 }
-            }, 5000);
+            }, 120000);
 
             System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
             System.out.print("> ");
