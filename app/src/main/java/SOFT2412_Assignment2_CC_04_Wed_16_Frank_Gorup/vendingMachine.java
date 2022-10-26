@@ -148,7 +148,7 @@ public class vendingMachine {
                         db.sellerModifyQuantity(toModify, item, newArray[0]);
                     }
                     if (toModify.equals("name")){
-                        db.sellderModifyName(toModify, item, newArray);;
+                        db.sellerModifyName(toModify, item, newArray);;
                     }
                     if (toModify.equals("category")){
                         db.sellderModifyCategory(toModify, item, newArray);;
@@ -172,7 +172,6 @@ public class vendingMachine {
                     
                 }
               
-                System.out.println(input);
             }
 
             if (input.toLowerCase().startsWith("help")) {

@@ -714,7 +714,7 @@ public class Database {
   }
 
   public void sellerModifyQuantity(String toModify, String item, String changeInto){
-      int itemCode = getItemIdByCode(item.toUpperCase());
+      int itemCode = getItemIdByCode(item.toLowerCase());
       try{
           int qty = Integer.parseInt(changeInto);
           updateItemQuantity(itemCode, qty);
@@ -748,8 +748,14 @@ public class Database {
 
   }
 
-  public void sellderModifyName(String toModify, String item, String[] name){
-      int itemCode = getItemIdByCode(item.toUpperCase());
+  public void sellerModifyName(String toModify, String item, String[] name){
+      int itemCode = getItemIdByCode(item.toLowerCase());
+
+      if (itemCode <= 0) {
+        System.out.println("Invalid item code");
+        return;
+      }
+
       String fullName = "";
       for (String x : name){
           fullName += x;
@@ -758,7 +764,15 @@ public class Database {
       StringBuilder sb = new StringBuilder(fullName);
       sb.deleteCharAt(sb.length()-1);
       String finalFullName = sb.toString();
-      updateItemName(itemCode, finalFullName);
+      
+      int res = updateItemName(itemCode, finalFullName);
+
+      if (res > 0) {
+        System.out.println("Item name updated successfully");
+      } else {
+        System.out.println("Unable to update item name");
+      }
+
   }
 
   public int updateItemCategory(int itemId, String newCategory) {
@@ -785,7 +799,7 @@ public class Database {
   }
 
   public void sellderModifyCategory(String toModify, String item, String[] category){
-      int itemCode = getItemIdByCode(item.toUpperCase());
+      int itemCode = getItemIdByCode(item.toLowerCase());
       String fullCategory = "";
       for (String x : category){
           fullCategory += x;
@@ -821,7 +835,7 @@ public class Database {
   }
 
   public void sellderModifyCode(String toModify, String item, String Code){
-    int itemCode = getItemIdByCode(item.toUpperCase());
+    int itemCode = getItemIdByCode(item.toLowerCase());
     updateItemCode(itemCode, Code);
   }
 
@@ -849,7 +863,7 @@ public class Database {
   }
 
   public void sellderModifyPrice(String toModify, String item, String Price){
-    int itemCode = getItemIdByCode(item.toUpperCase());
+    int itemCode = getItemIdByCode(item.toLowerCase());
     updateItemPrice(itemCode, Price);
   }
 
