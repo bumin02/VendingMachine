@@ -325,7 +325,7 @@ public class vendingMachine {
             System.out.println(
                     "\n----------------------------------------------------HELP LIST----------------------------------------------------");
             System.out.println(
-                    "\nlist [String: categories] : Categories include chocolate, drinks, candies, chips, or all.\n    Example:\n    > list chocolate\n            Mars (MA) QTY: 20 Price: $2\n            M&M (MM) QTY: 10 Price: $5\n            Bounty (BO) QTY: 5 Price: $1\n            Snickers (SN) QTY: 15 Price: 5\n");
+                    "\nlist [String: categories] : Categories include chocolates, drinks, candies, chips, or all.\n    Example:\n    > list chocolates\n            Mars (MA) QTY: 20 Price: $2\n            M&M (MM) QTY: 10 Price: $5\n            Bounty (BO) QTY: 5 Price: $1\n            Snickers (SN) QTY: 15 Price: 5\n");
             System.out.println(
                     "\n--------------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("login")) {
