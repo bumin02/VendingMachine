@@ -9,6 +9,7 @@ public class Card {
     public Card(String name, String number) {
         this.number = number;
         this.name = name;
+        this.id = -1;
     }
 
     public Card(int id, String name, String number) {

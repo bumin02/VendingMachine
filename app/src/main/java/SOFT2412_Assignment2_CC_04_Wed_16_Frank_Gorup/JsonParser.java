@@ -13,11 +13,6 @@ import java.util.ArrayList;
 
 public class JsonParser {
 
-	/**
-	 * This method reads the configuration file and creates the pool table
-	 * 
-	 * @param path
-	 */
 	public static ArrayList<Card> parseCreditCardFile() {
 
 		JSONParser parser = new JSONParser();

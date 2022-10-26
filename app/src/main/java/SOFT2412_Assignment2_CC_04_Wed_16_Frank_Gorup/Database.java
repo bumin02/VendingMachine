@@ -2,7 +2,6 @@ package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
 import java.io.File;
 import java.sql.Connection;
-import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -713,16 +712,16 @@ public class Database {
 
   }
 
-  public void sellerModifyQuantity(String toModify, String item, String changeInto){
-      int itemCode = getItemIdByCode(item.toLowerCase());
-      try{
-          int qty = Integer.parseInt(changeInto);
-          updateItemQuantity(itemCode, qty);
-      }catch (NumberFormatException e){
-        System.out.println("Invalid quantity");
-        return;
-      }
-      
+  public void sellerModifyQuantity(String toModify, String item, String changeInto) {
+    int itemCode = getItemIdByCode(item.toLowerCase());
+    try {
+      int qty = Integer.parseInt(changeInto);
+      updateItemQuantity(itemCode, qty);
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid quantity");
+      return;
+    }
+
   }
 
   public int updateItemName(int itemId, String newName) {
@@ -748,30 +747,30 @@ public class Database {
 
   }
 
-  public void sellerModifyName(String toModify, String item, String[] name){
-      int itemCode = getItemIdByCode(item.toLowerCase());
+  public void sellerModifyName(String toModify, String item, String[] name) {
+    int itemCode = getItemIdByCode(item.toLowerCase());
 
-      if (itemCode <= 0) {
-        System.out.println("Invalid item code");
-        return;
-      }
+    if (itemCode <= 0) {
+      System.out.println("Invalid item code");
+      return;
+    }
 
-      String fullName = "";
-      for (String x : name){
-          fullName += x;
-          fullName += " ";
-      }
-      StringBuilder sb = new StringBuilder(fullName);
-      sb.deleteCharAt(sb.length()-1);
-      String finalFullName = sb.toString();
-      
-      int res = updateItemName(itemCode, finalFullName);
+    String fullName = "";
+    for (String x : name) {
+      fullName += x;
+      fullName += " ";
+    }
+    StringBuilder sb = new StringBuilder(fullName);
+    sb.deleteCharAt(sb.length() - 1);
+    String finalFullName = sb.toString();
 
-      if (res > 0) {
-        System.out.println("Item name updated successfully");
-      } else {
-        System.out.println("Unable to update item name");
-      }
+    int res = updateItemName(itemCode, finalFullName);
+
+    if (res > 0) {
+      System.out.println("Item name updated successfully");
+    } else {
+      System.out.println("Unable to update item name");
+    }
 
   }
 
@@ -798,17 +797,17 @@ public class Database {
 
   }
 
-  public void sellderModifyCategory(String toModify, String item, String[] category){
-      int itemCode = getItemIdByCode(item.toLowerCase());
-      String fullCategory = "";
-      for (String x : category){
-          fullCategory += x;
-          fullCategory += " ";
-      }
-      StringBuilder sb = new StringBuilder(fullCategory);
-      sb.deleteCharAt(sb.length()-1);
-      String finalFullCategory = sb.toString();
-      updateItemCategory(itemCode, finalFullCategory);
+  public void sellderModifyCategory(String toModify, String item, String[] category) {
+    int itemCode = getItemIdByCode(item.toLowerCase());
+    String fullCategory = "";
+    for (String x : category) {
+      fullCategory += x;
+      fullCategory += " ";
+    }
+    StringBuilder sb = new StringBuilder(fullCategory);
+    sb.deleteCharAt(sb.length() - 1);
+    String finalFullCategory = sb.toString();
+    updateItemCategory(itemCode, finalFullCategory);
   }
 
   public int updateItemCode(int itemId, String newCode) {
@@ -834,7 +833,7 @@ public class Database {
 
   }
 
-  public void sellderModifyCode(String toModify, String item, String Code){
+  public void sellderModifyCode(String toModify, String item, String Code) {
     int itemCode = getItemIdByCode(item.toLowerCase());
     updateItemCode(itemCode, Code);
   }
@@ -862,9 +861,43 @@ public class Database {
 
   }
 
-  public void sellderModifyPrice(String toModify, String item, String Price){
+  public void sellderModifyPrice(String toModify, String item, String Price) {
     int itemCode = getItemIdByCode(item.toLowerCase());
     updateItemPrice(itemCode, Price);
+  }
+
+  public ArrayList<Order> getOrders() {
+    ArrayList<Order> orders = new ArrayList<Order>();
+    String selectOrders = "SELECT * FROM orders;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(selectOrders)) {
+
+      ResultSet result = statement.executeQuery();
+
+      while (result.next()) {
+        int id = result.getInt("id");
+        int userId = result.getInt("userId");
+        LocalDate date = result.getDate("date").toLocalDate();
+        int itemId = result.getInt("itemId");
+        int quantity = result.getInt("quantity");
+        double amountPaid = result.getDouble("amountPaid");
+        double change = result.getDouble("change");
+        String paymentMethod = result.getString("paymentMethod");
+
+        Order order = new Order(id, userId, date, itemId, quantity, amountPaid, change, paymentMethod);
+
+        orders.add(order);
+      }
+
+      return orders;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return null;
+
+    }
   }
 
 }

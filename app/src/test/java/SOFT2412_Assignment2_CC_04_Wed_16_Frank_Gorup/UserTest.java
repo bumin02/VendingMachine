@@ -12,8 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Scanner;
-
 public class UserTest {
 
   User user;
@@ -89,8 +87,6 @@ public class UserTest {
 
   }
 
-  // todo: how to mock system.in
-
   @Test
   public void testAssociateCard3() {
 
@@ -115,6 +111,32 @@ public class UserTest {
 
     int res = this.user.associateCardWithUser(this.card, this.db);
     assertEquals(res, 2);
+
+  }
+
+  @Test
+  public void testHasSellerPermissions() {
+
+    this.user = new User(123, "Account", "Password", "seller", -1);
+    assertEquals(true, this.user.hasSellerPermissions());
+
+  }
+
+  @Test
+  public void testHasCashierPermissions() {
+
+    this.user = new User(123, "Account", "Password", "cashier", -1);
+    assertEquals(true, this.user.hasCashierPermissions());
+
+  }
+
+  @Test
+  public void testHasOwnerPermissions() {
+
+    this.user = new User(123, "Account", "Password", "owner", -1);
+    assertEquals(true, this.user.hasOwnerPermissions());
+    assertEquals(true, this.user.hasCashierPermissions());
+    assertEquals(true, this.user.hasSellerPermissions());
 
   }
 
