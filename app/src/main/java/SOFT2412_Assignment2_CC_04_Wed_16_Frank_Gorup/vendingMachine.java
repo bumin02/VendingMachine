@@ -695,7 +695,7 @@ public class vendingMachine {
         }
 
         System.out.println("Order successful!");
-        System.out.println("change " + totalCash + " - " + totalCost + " = " + "$" + (totalCash - totalCost));
+        System.out.println("change " + totalCash + " - " + totalCost + " = " + "$" + df.format(totalCash - totalCost));
 
         if (change == 0) {
             return 0;
