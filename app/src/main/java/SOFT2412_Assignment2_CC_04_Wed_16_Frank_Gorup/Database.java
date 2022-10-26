@@ -71,7 +71,7 @@ public class Database {
         + "code text NOT NULL,"
         + "category text NOT NULL,"
         + "price real NOT NULL,"
-        + "quantity integer NOT NULL CHECK (quantity > 0)"
+        + "quantity integer NOT NULL CHECK (quantity >= 0)"
         + ");";
 
     String createCancelledOrdersTable = "CREATE TABLE IF NOT EXISTS cancelledOrders ("
