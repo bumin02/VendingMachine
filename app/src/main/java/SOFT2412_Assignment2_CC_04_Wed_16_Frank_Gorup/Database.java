@@ -71,7 +71,7 @@ public class Database {
         + "code text NOT NULL,"
         + "category text NOT NULL,"
         + "price real NOT NULL,"
-        + "quantity integer NOT NULL"
+        + "quantity integer NOT NULL CHECK (quantity > 0)"
         + ");";
 
     String createCancelledOrdersTable = "CREATE TABLE IF NOT EXISTS cancelledOrders ("
@@ -86,7 +86,7 @@ public class Database {
         + "userId integer NOT NULL,"
         + "date DATETIME NOT NULL,"
         + "itemId integer NOT NULL,"
-        + "quantity integer NOT NULL,"
+        + "quantity INT unsigned NOT NULL, "
         + "amountPaid real NOT NULL,"
         + "returnedChange real NOT NULL,"
         + "paymentMethod text NOT NULL,"
@@ -96,7 +96,7 @@ public class Database {
     String createChangeTable = "CREATE TABLE IF NOT EXISTS change ("
         + "id integer PRIMARY KEY,"
         + "denomination text NOT NULL,"
-        + "quantity integer NOT NULL"
+        + "quantity INT unsigned NOT NULL"
         + ");";
 
     try (Connection conn = DriverManager.getConnection(dbURL);
@@ -652,7 +652,7 @@ public class Database {
 
     } catch (SQLException e) {
 
-      System.out.println(e.getMessage());
+      System.out.println("Unable to proceed with the given data. Please check your input.");
       return 0;
 
     }
@@ -711,6 +711,146 @@ public class Database {
 
     }
 
+  }
+
+  public void sellerModifyQuantity(String toModify, String item, String changeInto){
+      int itemCode = getItemIdByCode(item.toUpperCase());
+      try{
+          int qty = Integer.parseInt(changeInto);
+          updateItemQuantity(itemCode, qty);
+      }catch (NumberFormatException e){
+        System.out.println("Invalid quantity");
+        return;
+      }
+      
+  }
+
+  public int updateItemName(int itemId, String newName) {
+
+    String updateItemQuantity = "UPDATE items SET name = ? WHERE id = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
+
+      statement.setString(1, newName);
+      statement.setInt(2, itemId);
+
+      statement.execute();
+
+      return itemId;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public void sellderModifyName(String toModify, String item, String[] name){
+      int itemCode = getItemIdByCode(item.toUpperCase());
+      String fullName = "";
+      for (String x : name){
+          fullName += x;
+          fullName += " ";
+      }
+      StringBuilder sb = new StringBuilder(fullName);
+      sb.deleteCharAt(sb.length()-1);
+      String finalFullName = sb.toString();
+      updateItemName(itemCode, finalFullName);
+  }
+
+  public int updateItemCategory(int itemId, String newCategory) {
+
+    String updateItemQuantity = "UPDATE items SET category = ? WHERE id = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
+
+      statement.setString(1, newCategory);
+      statement.setInt(2, itemId);
+
+      statement.execute();
+
+      return itemId;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public void sellderModifyCategory(String toModify, String item, String[] category){
+      int itemCode = getItemIdByCode(item.toUpperCase());
+      String fullCategory = "";
+      for (String x : category){
+          fullCategory += x;
+          fullCategory += " ";
+      }
+      StringBuilder sb = new StringBuilder(fullCategory);
+      sb.deleteCharAt(sb.length()-1);
+      String finalFullCategory = sb.toString();
+      updateItemCategory(itemCode, finalFullCategory);
+  }
+
+  public int updateItemCode(int itemId, String newCode) {
+
+    String updateItemQuantity = "UPDATE items SET code = ? WHERE id = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
+
+      statement.setString(1, newCode);
+      statement.setInt(2, itemId);
+
+      statement.execute();
+
+      return itemId;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public void sellderModifyCode(String toModify, String item, String Code){
+    int itemCode = getItemIdByCode(item.toUpperCase());
+    updateItemCode(itemCode, Code);
+  }
+
+  public int updateItemPrice(int itemId, String newPrice) {
+
+    String updateItemQuantity = "UPDATE items SET price = ? WHERE id = ?;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        PreparedStatement statement = conn.prepareStatement(updateItemQuantity)) {
+
+      statement.setString(1, newPrice);
+      statement.setInt(2, itemId);
+
+      statement.execute();
+
+      return itemId;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return 0;
+
+    }
+
+  }
+
+  public void sellderModifyPrice(String toModify, String item, String Price){
+    int itemCode = getItemIdByCode(item.toUpperCase());
+    updateItemPrice(itemCode, Price);
   }
 
 }
