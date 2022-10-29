@@ -1,0 +1,16 @@
+mineral Water (mw) | quantity sold 0
+sprite (sp) | quantity sold 0
+coca cola (cc) | quantity sold 0
+pepsi (pe) | quantity sold 0
+juice (ju) | quantity sold 0
+mars (ma) | quantity sold 0
+m&m (mm) | quantity sold 0
+bounty (bo) | quantity sold 0
+snickers (sn) | quantity sold 0
+smiths (sm) | quantity sold 0
+pringles (pr) | quantity sold 0
+kettle (ke) | quantity sold 0
+thins (th) | quantity sold 0
+mentos (me) | quantity sold 0
+sour patch (sp) | quantity sold 0
+skittles (sk) | quantity sold 0
