@@ -7,8 +7,8 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Arrays;
-import java.io.FileWriter;   // Import the FileWriter class
-import java.io.IOException;  // Import the IOException class to handle errors
+import java.io.FileWriter; // Import the FileWriter class
+import java.io.IOException; // Import the IOException class to handle errors
 
 public class vendingMachine {
     ArrayList<Item> items;
@@ -26,7 +26,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-       //initialSetup();
+        // initialSetup();
     }
 
     public User getCurrentUser() {
@@ -38,6 +38,7 @@ public class vendingMachine {
 
         // fake user
         this.db.insertIntoUsersTable("test", "test", "buyer");
+        this.db.insertIntoUsersTable("seller", "seller", "seller");
 
         // dummy items with quantities and prices defined
         this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
@@ -94,7 +95,7 @@ public class vendingMachine {
                     "---------------------------------------------------------------------------------------------------------------------\n");
         }
 
-        System.out.println("What would you like to do? (type help for instructions, exit to quit)");
+        System.out.println("What would you like to do anonymous user? (type help for instructions, exit to quit)");
         System.out.print("> ");
 
         timer = new Timer();
@@ -192,7 +193,9 @@ public class vendingMachine {
                 }
             }, 120000);
 
-            System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+            String name = this.currentUser == null ? "anonymous user" : this.currentUser.getAccount();
+
+            System.out.println("\nWhat would you like to do " + name + "? (type help for instructions, exit to quit)");
             System.out.print("> ");
         }
 
@@ -205,8 +208,9 @@ public class vendingMachine {
             FileWriter myWriter = new FileWriter("reports/availableItems.txt");
             ArrayList<Item> items = db.getAllItems();
 
-            for (Item i: items) {
-                String message = String.format("%s (%s): category: %s, price: %s, quantity: %s\r\n",i.getName(), i.getCode(), i.getCategory(), i.getPrice(), i.getQuantity());
+            for (Item i : items) {
+                String message = String.format("%s (%s): category: %s, price: %s, quantity: %s\r\n", i.getName(),
+                        i.getCode(), i.getCategory(), i.getPrice(), i.getQuantity());
                 myWriter.write(message);
             }
 
@@ -216,31 +220,31 @@ public class vendingMachine {
             ArrayList<Order> orders = db.getOrders();
 
             if (orders == null) {
-                for (Item i: items) {
-                    String message = String.format("%s (%s) | quantity sold 0\r\n",i.getName(), i.getCode());
+                for (Item i : items) {
+                    String message = String.format("%s (%s) | quantity sold 0\r\n", i.getName(), i.getCode());
                     summary.write(message);
                 }
                 return;
             }
 
-            for (Item i: items) {
+            for (Item i : items) {
                 int quant = 0;
-                for (Order o: orders) {
-                    if (o.getItemId()== i.getId()) {
+                for (Order o : orders) {
+                    if (o.getItemId() == i.getId()) {
                         quant += o.getQuantity();
                     }
                 }
 
-                String message = String.format("%s (%s) | quantity sold %s\n",i.getName(), i.getCode(), quant);
+                String message = String.format("%s (%s) | quantity sold %s\n", i.getName(), i.getCode(), quant);
                 summary.write(message);
             }
 
             summary.close();
             System.out.println("check availableItems.txt and summary.txt for reports");
-          } catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-          }
+        }
     }
 
     public int cashReplenishment(String denomination, int quantity) {
@@ -315,7 +319,6 @@ public class vendingMachine {
         }
 
     }
-
 
     public boolean listOptions(String input) {
 
@@ -430,7 +433,7 @@ public class vendingMachine {
         if (userInput[1].equals("cash")) {
             makeCashPurchase(userInput, sc);
         } else if (userInput[1].equals("card")) {
-            makeCardPurchase(userInput);
+            makeCardPurchase(userInput, sc);
         } else {
             System.out.println("Invalid payment method!");
             return;
@@ -471,6 +474,8 @@ public class vendingMachine {
 
             System.out.println("The order could not be processed. " + reason);
 
+            logoutUser();
+
             return;
 
         }
@@ -483,6 +488,8 @@ public class vendingMachine {
             this.db.createCancelledOrder(userId, date, reason);
 
             System.out.println("The order could not be processed. " + reason);
+
+            logoutUser();
 
             return;
 
@@ -564,6 +571,8 @@ public class vendingMachine {
                 System.out.println("Error in updating item quantity!");
                 return;
             }
+
+            logoutUser();
 
         }
 
@@ -740,6 +749,8 @@ public class vendingMachine {
 
             System.out.println("The order could not be processed. " + reason);
 
+            logoutUser();
+
             return -1;
 
         }
@@ -747,7 +758,8 @@ public class vendingMachine {
         System.out.println("Order successful!");
         System.out.println("change " + totalCash + " - " + totalCost + " = " + "$" + df.format(totalCash - totalCost));
 
-        if (change == 0) {
+        if ((totalCash - totalCost) == 0) {
+            System.out.println("No change required.");
             return 0;
         }
 
@@ -860,7 +872,7 @@ public class vendingMachine {
 
     }
 
-    public void makeCardPurchase(String userInput[]) {
+    public void makeCardPurchase(String userInput[], Scanner sc) {
 
         // buyer card 4 spr
         // buyer card 4 spr name number
@@ -889,7 +901,31 @@ public class vendingMachine {
             int res;
 
             if (userId != -1) {
-                res = setUserCard(cardName, cardNumber);
+
+                System.out.print("Do you want to store this card on file? (Y/N): ");
+
+                String storeCard = sc.nextLine();
+
+                if (storeCard.equals("Y") || storeCard.equals("y")) {
+
+                    System.out.println("Storing card on file...");
+
+                    res = setUserCard(cardName, cardNumber);
+
+                } else {
+
+                    System.out.println("Not storing card on file...");
+
+                    boolean flag = this.db.checkCardValidity(cardName, cardNumber);
+
+                    if (flag) {
+                        res = 1;
+                    } else {
+                        res = -2;
+                    }
+
+                }
+
             } else {
 
                 boolean flag = this.db.checkCardValidity(cardName, cardNumber);
@@ -911,6 +947,8 @@ public class vendingMachine {
                 this.db.createCancelledOrder(userId, date, reason);
 
                 System.out.println("The order could not be processed. " + reason);
+
+                logoutUser();
 
                 return;
 
@@ -938,6 +976,8 @@ public class vendingMachine {
 
             System.out.println("The order could not be processed. " + reason);
 
+            logoutUser();
+
             return;
 
         }
@@ -950,6 +990,8 @@ public class vendingMachine {
             this.db.createCancelledOrder(userId, date, reason);
 
             System.out.println("The order could not be processed. " + reason);
+
+            logoutUser();
 
             return;
 
@@ -972,6 +1014,7 @@ public class vendingMachine {
         }
 
         System.out.println("card valid, transaction successful!");
+        logoutUser();
         return;
 
     }
@@ -1006,6 +1049,10 @@ public class vendingMachine {
 
         return -1;
 
+    }
+
+    public void logoutUser() {
+        this.currentUser = null;
     }
 
 }
