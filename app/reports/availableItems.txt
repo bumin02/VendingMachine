@@ -1,21 +1,5 @@
-mineral Water (mw): category: drinks, price: 3.0, quantity: 20
-sprite (sp): category: drinks, price: 5.0, quantity: 10
-coca cola (cc): category: drinks, price: 5.0, quantity: 10
-pepsi (pe): category: drinks, price: 4.0, quantity: 10
-juice (ju): category: drinks, price: 3.5, quantity: 10
-mars (ma): category: chocolates, price: 5.0, quantity: 12
-m&m (mm): category: chocolates, price: 6.0, quantity: 12
-bounty (bo): category: chocolates, price: 5.0, quantity: 12
-snickers (sn): category: chocolates, price: 7.0, quantity: 12
-smiths (sm): category: chips, price: 5.0, quantity: 10
-pringles (pr): category: chips, price: 6.0, quantity: 10
-kettle (ke): category: chips, price: 5.0, quantity: 10
-thins (th): category: chips, price: 4.0, quantity: 10
-mentos (me): category: candies, price: 3.0, quantity: 15
-sour patch (sp): category: candies, price: 5.0, quantity: 12
-skittles (sk): category: candies, price: 6.0, quantity: 12
-mineral Water (mw): category: drinks, price: 3.0, quantity: 20
-sprite (sp): category: drinks, price: 5.0, quantity: 10
+mineral Water (mw): category: drinks, price: 3.0, quantity: 6
+sprite (sp): category: drinks, price: 5.0, quantity: 1
 coca cola (cc): category: drinks, price: 5.0, quantity: 10
 pepsi (pe): category: drinks, price: 4.0, quantity: 10
 juice (ju): category: drinks, price: 3.5, quantity: 10
