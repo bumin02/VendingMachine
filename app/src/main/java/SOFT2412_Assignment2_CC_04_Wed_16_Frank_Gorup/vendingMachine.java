@@ -220,6 +220,7 @@ public class vendingMachine {
             ArrayList<Order> orders = db.getOrders();
 
             if (orders == null) {
+                System.out.println("system has been nulled");
                 for (Item i : items) {
                     String message = String.format("%s (%s) | quantity sold 0\r\n", i.getName(), i.getCode());
                     summary.write(message);
@@ -227,11 +228,13 @@ public class vendingMachine {
                 // return;
             }
             else {
+                System.out.println("system has been elsed");
                 for (Item i : items) {
                     int quant = 0;
                     for (Order o : orders) {
                         if (o.getItemId() == i.getId()) {
                             quant += o.getQuantity();
+                            System.out.println(i.getName() + quant);
                         }
                     }
                     String message = String.format("%s (%s) | quantity sold %s\n", i.getName(), i.getCode(), quant);
@@ -241,6 +244,56 @@ public class vendingMachine {
 
             summary.close();
             System.out.println("check availableItems.txt and summary.txt for reports");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public void getCashierReport() {
+        try {
+            FileWriter writeChange = new FileWriter("reports/cashierAvailableChange.txt");
+            ArrayList<Item> items = db.getAllItems();
+
+            String[] denominations = {"100", "50", "20", "10", "5", "1", "50c", "20c", "10c", "5c"};
+
+            for (String i : denominations) {
+                int denominationQuantity = db.getAmountOfChangeForDenomination(i);
+                if (i.charAt(i.length()-1) == 'c') {
+                    String message = String.format("Demonination: " + i + " | Quantity: " + denominationQuantity + "\n");
+                    writeChange.write(message);
+                }
+                else { // if denomination if not a coin, add a $ in front of it
+                    String message = String.format("Demonination: $" + i + " | Quantity: " + denominationQuantity + "\n");
+                    writeChange.write(message);
+                }
+            }
+
+            writeChange.close();
+
+            FileWriter summary = new FileWriter("reports/cashierSummary.txt");
+            ArrayList<Order> orders = this.db.getOrders();  
+
+            ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
+            lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
+            lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
+
+            if (lastFiveOrders == null) {
+                System.out.println("No orders have been placed");
+                summary.write("---------- no orders have been placed ----------");
+            }
+
+            else {
+                System.out.println("Order(s) have been recorded:");
+                for (Order i : lastFiveOrders) {
+                    String message = String.format("%s (%s) | Paid: %s Returned: %s Method: %s\r\n", i.getDate(), i.getId(), i.getAmountPaid(), i.getChange(), i.getPaymentMethod());
+                    System.out.print(message);
+                    summary.write(message);
+                }
+            }
+
+            summary.close();            
+
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -314,6 +367,7 @@ public class vendingMachine {
 
             if (this.currentUser.hasSellerPermissions()) {
                 getSellerReport();
+                getCashierReport();
             }
 
         }
@@ -463,7 +517,9 @@ public class vendingMachine {
         }
 
         int quantity = Integer.parseInt(userInput[2]);
+        // System.out.println("YOU WANT TO PURCHASE " + quantity + " ITEMS");
         int currentItemQuantity = this.db.getItemQuantityByCode(itemCode);
+        
 
         if (quantity <= 0) {
 

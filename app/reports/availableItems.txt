@@ -1,6 +1,6 @@
-mineral Water (mw): category: drinks, price: 3.0, quantity: 3
+mineral Water (mw): category: drinks, price: 3.0, quantity: 12
 sprite (sp): category: drinks, price: 5.0, quantity: 1
-coca cola (cc): category: drinks, price: 5.0, quantity: 10
+coca cola (cc): category: drinks, price: 5.0, quantity: 8
 pepsi (pe): category: drinks, price: 4.0, quantity: 10
 juice (ju): category: drinks, price: 3.5, quantity: 10
 mars (ma): category: chocolates, price: 5.0, quantity: 12
