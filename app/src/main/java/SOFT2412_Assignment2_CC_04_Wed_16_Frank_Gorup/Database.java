@@ -199,6 +199,25 @@ public class Database {
 
   }
 
+  public int removeFromUsersTable(String account) {
+
+      String sql = "DELETE FROM USERS WHERE account = ?";
+
+      try (Connection conn = DriverManager.getConnection(dbURL);
+           PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        // set the corresponding param
+        pstmt.setString(1, account);
+        // execute the delete statement
+        pstmt.executeUpdate();
+
+      } catch (SQLException e) {
+        System.out.println(e.getMessage());
+        return 0;
+      }
+      return 1;
+  }
+
   public User insertIntoUsersTable(String account, String password, String role) {
 
     String insertIntoUsersTable = "INSERT INTO USERS (account, password, role, cardId) VALUES (?, ?, ?, ?);";
@@ -223,7 +242,6 @@ public class Database {
       return null;
 
     }
-
   }
 
   public User getUserByAccountAndPassword(String account, String pwd) {
