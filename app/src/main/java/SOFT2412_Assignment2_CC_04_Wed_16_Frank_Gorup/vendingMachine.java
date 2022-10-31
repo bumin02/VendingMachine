@@ -35,7 +35,7 @@ public class vendingMachine {
 
         // for setup if needed
 //       initialSetup();
-        // initialSetup();
+        //initialSetup();
     }
 
     public User getCurrentUser() {
