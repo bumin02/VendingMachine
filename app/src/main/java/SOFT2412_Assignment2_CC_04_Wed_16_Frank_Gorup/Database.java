@@ -948,7 +948,7 @@ public class Database {
       while (result.next()) {
         int id = result.getInt("id");
         int userId = result.getInt("userId");
-        LocalDate date = result.getDate("date").toLocalDate();
+        LocalDate date = LocalDate.parse(result.getString("date"));
         int itemId = result.getInt("itemId");
         int quantity = result.getInt("quantity");
         double amountPaid = result.getDouble("amountPaid");
@@ -968,6 +968,41 @@ public class Database {
       return null;
 
     }
+  }
+
+  public ArrayList<Order> getAllCancelled() {
+
+    String getAllCancelled = "SELECT * FROM cancelledOrders;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        Statement statement = conn.createStatement()) {
+
+      ResultSet rs = statement.executeQuery(getAllCancelled);
+
+      ArrayList<Order> orders = new ArrayList<>();
+
+      // create a list of orders from the result set
+      while (rs.next()) {
+        
+        int id = rs.getInt("id");
+        int userId = rs.getInt("userId");
+        LocalDate date = LocalDate.parse(rs.getString("date"));
+        String reason = rs.getString("reason");
+
+        Order order = new Order(id, userId, date, -1, -1, -1, -1, reason);
+        orders.add(order);
+
+      }
+
+      return orders;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return null;
+
+    }
+
   }
 
 }
