@@ -1,2 +1,0 @@
-owner | Role : owner
-seller | Role : seller
