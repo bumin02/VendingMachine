@@ -231,18 +231,19 @@ public class vendingMachine {
                 }
                 summary.close();
                 return;
+
             }
-
-            for (Item i : items) {
-                int quant = 0;
-                for (Order o : orders) {
-                    if (o.getItemId() == i.getId()) {
-                        quant += o.getQuantity();
+            else {
+                for (Item i : items) {
+                    int quant = 0;
+                    for (Order o : orders) {
+                        if (o.getItemId() == i.getId()) {
+                            quant += o.getQuantity();
+                        }
                     }
+                    String message = String.format("%s (%s) | quantity sold %s\n", i.getName(), i.getCode(), quant);
+                    summary.write(message);
                 }
-
-                String message = String.format("%s (%s) | quantity sold %s\n", i.getName(), i.getCode(), quant);
-                summary.write(message);
             }
 
             summary.close();
