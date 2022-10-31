@@ -122,9 +122,6 @@ public class vendingMachine {
             }
         }, 120000);
 
-        System.out.println("What would you like to do? (type help for instructions, exit to quit)");
-        System.out.print("> ");
-
         while (sc.hasNext()) {
 
             timer.cancel();
@@ -194,14 +191,14 @@ public class vendingMachine {
 
             else if (input.toLowerCase().startsWith("seller")) {
                 if (currentUser == null || !currentUser.hasSellerPermissions()) {
-                    System.out.println("Sorry you do not have seller permission.");
+                    System.out.println("ERROR: Sorry you do not have seller permission.");
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
                 }
                 String[] inputList = input.toLowerCase().split(" ");
                 if (inputList.length < 2) {
-                    System.out.println("Missing inputs. Please try again.");
+                    System.out.println("ERROR: Missing inputs. Please try again.");
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
@@ -216,7 +213,7 @@ public class vendingMachine {
 
                 else if (inputList[1].equals("modify")) {
                     if (inputList.length < 5) {
-                        System.out.println("Missing inputs. Please try again.");
+                        System.out.println("ERROR: Missing inputs. Please try again.");
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
@@ -239,7 +236,7 @@ public class vendingMachine {
                     }
                     else if (toModify.equals("code")) {
                         if (newArray.length > 1) {
-                            System.out.println(ANSI_RED + "Invalid input, code must be one word" + ANSI_RESET);
+                            System.out.println(ANSI_RED + "ERROR: Invalid input, code must be one word" + ANSI_RESET);
                         } else {
                             db.sellderModifyCode(toModify, item, newArray[0]);
                             ;
@@ -248,13 +245,13 @@ public class vendingMachine {
                     else if (toModify.equals("price")) {
                         if (newArray.length > 1) {
 
-                            System.out.println(ANSI_RED + "Invalid input, please only input 1 price" + ANSI_RESET);
+                            System.out.println(ANSI_RED + "ERROR: Invalid input, please only input 1 price" + ANSI_RESET);
                         } else {
                             db.sellderModifyPrice(toModify, item, newArray[0]);
                         }
                     }
                     else {
-                        System.out.println("Invalid inputs. Please try again.");
+                        System.out.println("ERROR: Invalid inputs. Please try again.");
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
@@ -262,7 +259,7 @@ public class vendingMachine {
                 }
 
                 else {
-                    System.out.println("Invalid inputs. Please try again.");
+                    System.out.println("ERROR: Invalid inputs. Please try again.");
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;

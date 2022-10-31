@@ -731,16 +731,28 @@ public class Database {
 
   public void sellerModifyQuantity(String toModify, String item, String changeInto) {
     int itemCode = getItemIdByCode(item.toLowerCase());
+    if (itemCode <= 0) {
+      System.out.println("Invalid item code");
+      return;
+    }
     try {
       int qty = Integer.parseInt(changeInto);
+      if (qty > 15){
+        System.out.println("ERROR: Quantity added is over limit (15). Unable to process request.");
+        return;
+      }
+      else if(qty < 0){
+        System.out.println("ERROR: Quantity cannot be smaller than 0. Unable to process request.");
+        return;
+      }
       int res = updateItemQuantity(itemCode, qty);
       if (res > 0) {
         System.out.println("Item quantity updated successfully");
       } else {
-        System.out.println("Unable to update item quantity");
+        System.out.println("ERROR: Unable to update item quantity");
       }
     } catch (NumberFormatException e) {
-      System.out.println("Invalid quantity");
+      System.out.println("ERROR: Invalid quantity");
       return;
     }
 
@@ -773,7 +785,7 @@ public class Database {
     int itemCode = getItemIdByCode(item.toLowerCase());
 
     if (itemCode <= 0) {
-      System.out.println("Invalid item code");
+      System.out.println("ERROR: Invalid item code");
       return;
     }
 
@@ -791,7 +803,7 @@ public class Database {
     if (res > 0) {
       System.out.println("Item name updated successfully");
     } else {
-      System.out.println("Unable to update item name");
+      System.out.println("ERROR: Unable to update item name");
     }
 
   }
@@ -821,6 +833,10 @@ public class Database {
 
   public void sellderModifyCategory(String toModify, String item, String[] category) {
     int itemCode = getItemIdByCode(item.toLowerCase());
+    if (itemCode <= 0) {
+      System.out.println("ERROR: Invalid item code");
+      return;
+    }
     String fullCategory = "";
     for (String x : category) {
       fullCategory += x;
@@ -833,7 +849,7 @@ public class Database {
     if (res > 0) {
       System.out.println("Item category updated successfully");
     } else {
-      System.out.println("Unable to update item category");
+      System.out.println("ERROR: Unable to update item category");
     }
   }
 
@@ -862,11 +878,15 @@ public class Database {
 
   public void sellderModifyCode(String toModify, String item, String Code) {
     int itemCode = getItemIdByCode(item.toLowerCase());
+    if (itemCode <= 0) {
+      System.out.println("ERROR: Invalid item code");
+      return;
+    }
     int res = updateItemCode(itemCode, Code);
     if (res > 0) {
       System.out.println("Item code updated successfully");
     } else {
-      System.out.println("Unable to update item code");
+      System.out.println("ERROR: Unable to update item code");
     }
   }
 
@@ -895,11 +915,20 @@ public class Database {
 
   public void sellderModifyPrice(String toModify, String item, String Price) {
     int itemCode = getItemIdByCode(item.toLowerCase());
+    if (itemCode <= 0) {
+      System.out.println("ERROR: Invalid item code");
+      return;
+    }
+    Double priceDouble = Double.parseDouble(Price);
+    if(priceDouble < 0){
+      System.out.println("ERROR: Price must be greater than 0, unable to process request.");
+      return;
+    }
     int res = updateItemPrice(itemCode, Price);
     if (res > 0) {
       System.out.println("Item price updated successfully");
     } else {
-      System.out.println("Unable to update item price");
+      System.out.println("ERROR: Unable to update item price");
     }
   }
 
