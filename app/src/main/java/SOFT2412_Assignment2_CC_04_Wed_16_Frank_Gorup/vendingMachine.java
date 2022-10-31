@@ -1,16 +1,13 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
+import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Arrays;
+import java.util.*;
 import java.io.FileWriter; // Import the FileWriter class
 import java.io.IOException; // Import the IOException class to handle errors
 
@@ -35,7 +32,7 @@ public class vendingMachine {
 
         // for setup if needed
 //       initialSetup();
-        //initialSetup();
+        initialSetup();
     }
 
     public User getCurrentUser() {
@@ -44,6 +41,8 @@ public class vendingMachine {
 
     // helper function to add items to the vending machine
     public void initialSetup() {
+        deleteFiles("./src/vendingMachine.db");
+
 
         // fake user
         this.db.insertIntoUsersTable("owner", "owner", "owner");
@@ -86,6 +85,8 @@ public class vendingMachine {
 
     public void runVendingMachine() {
         Scanner sc = new Scanner(System.in);
+        File f = new File("reports");
+        f.mkdir();
 
         // delete files
         deleteFiles("reports/availableItems.txt");
@@ -149,6 +150,8 @@ public class vendingMachine {
             }
 
             else if (input.toLowerCase().startsWith("owner")) {
+                ArrayList<User> users = db.getAllUsers();
+
                 if (currentUser == null || !currentUser.hasOwnerPermissions()) {
                     System.out.println("Sorry you do not have owner permission.");
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
@@ -166,17 +169,18 @@ public class vendingMachine {
                     ownerLsUsersTerminal();
                 }
                 else if (inputList[1].equals("remove")){
-                    if (inputList.length < 3) {
+                    if (inputList.length < 4) {
                         System.out.println("Missing inputs. Please try again.");
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
+                    } else if (!inputList[3].toLowerCase(Locale.ROOT).equals("owner") && !inputList[3].toLowerCase(Locale.ROOT).equals("seller") && !inputList[3].toLowerCase(Locale.ROOT).equals("cashier")){
+                        System.out.println("Cannot remove the user with the role specified.");
                     }
 
-                    ArrayList<User> users = db.getAllUsers();
                     boolean suc = false;
                     for (User i: users) {
-                        if (i.getAccount().equals(inputList[2]) && !inputList[2].equals(currentUser.getAccount())) {
+                        if (i.getAccount().equals(inputList[2]) && !inputList[2].equals(currentUser.getAccount()) && inputList[3].equals(i.getRole())) {
                             db.removeFromUsersTable(inputList[2]);
                             System.out.println("Successfully removed the user");
                             suc = true;
@@ -186,6 +190,34 @@ public class vendingMachine {
                     if (!suc) {
                         System.out.println("Unsuccessful as an error has occurred. Please try again with valid input");
                     }
+                }
+                else if (inputList[1].equals("add")){
+                    if (inputList.length < 5) {
+                        System.out.println("Missing inputs. Please try again.");
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
+                    // Check whether account exist
+                    for (User i: users) {
+                        if (i.getAccount().equals(inputList[2])) {
+                            System.out.println("Account already exists.");
+                            System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                            System.out.print("> ");
+                            continue;
+                        }
+                    }
+
+                    if (!inputList[4].toLowerCase(Locale.ROOT).equals("owner") && !inputList[4].toLowerCase(Locale.ROOT).equals("seller") && !inputList[4].toLowerCase(Locale.ROOT).equals("cashier")){
+                        System.out.println("Cannot add the user with the role specified.");
+                    }
+
+                    db.insertIntoUsersTable(inputList[2], inputList[3], inputList[4]);
+                    System.out.println("Success");
+                }
+                else {
+                    System.out.println("Invalid command.");
                 }
             }
 
@@ -554,6 +586,11 @@ public class vendingMachine {
             System.out.println(
                     "\n5. HELP SELLER");
             System.out.println(
+                    "\n6. HELP OWNER");
+            System.out.println(
+                    "\n6. HELP CASHIER");
+
+            System.out.println(
                     "\n--------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("list")) {
             System.out.println(
@@ -587,11 +624,23 @@ public class vendingMachine {
             System.out.println(
                     "\n---------------------------------------------------HELP SELLER---------------------------------------------------");
             System.out.println(
-                    "\nseller modify [qty|price|name|code|category]] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
+                    "\nseller modify [qty|price|name|code|category]] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller changing the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
             System.out.println(
                     "\nseller list : Provides the seller with txt file for the list of current items and prints into the terminal.\n    Example:\n    > seller list\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
             System.out.println(
                     "\nseller summary [String: filetype]: Provides seller with the summary item history in txt file and prints into the terminal.\n    Example:\n    > seller summary\n            ----------seller_summary.txt----------\n            Mineral Water (MW) Total sold: 2\n            Mars (MA) Total sold: 7\n            Pringles (PR) Total sold: 4\n            Mentos (MN) Total sold: 5\n            --------------------------------------\n");
+            System.out.println(
+                    "\n------------------------------------------------------------------------------------------------------------------");
+
+        } else if (help.toLowerCase().equals("owner")) {
+            System.out.println(
+                    "\n---------------------------------------------------HELP OWNER---------------------------------------------------");
+            System.out.println(
+                    "\nowner remove [String: role] [String: account name] : Seller is able to remove a seller or cashier or owner that is not the owner itself.\n    Example:\n    > owner remove seller seller\n            Success!\n");
+            System.out.println(
+                    "\nowner list : Provides the seller with txt file for the list of users and prints into the terminal.\n    Example:\n    > owner list\n            ----------users list.txt----------\n            owner | Role : owner\n            test | Role : buyer\n                      -------------------------------------\n");
+            System.out.println(
+                    "\nowner add [String: account name] [String: password] [String: role]: Seller is able to add a seller or cashier or owner.\n    Example:\n    > owner add account password seller\n            Success\n");
             System.out.println(
                     "\n------------------------------------------------------------------------------------------------------------------");
         } else {
