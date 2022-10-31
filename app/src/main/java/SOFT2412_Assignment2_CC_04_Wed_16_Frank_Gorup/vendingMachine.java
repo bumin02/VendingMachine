@@ -1,5 +1,9 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,6 +21,10 @@ public class vendingMachine {
     static Timer timer;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_RESET = "\u001B[0m";
 
     public vendingMachine(Database db) {
         this.db = db;
@@ -26,7 +34,8 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-        // initialSetup();
+//       initialSetup();
+        //initialSetup();
     }
 
     public User getCurrentUser() {
@@ -37,6 +46,7 @@ public class vendingMachine {
     public void initialSetup() {
 
         // fake user
+        this.db.insertIntoUsersTable("owner", "owner", "owner");
         this.db.insertIntoUsersTable("test", "test", "buyer");
         this.db.insertIntoUsersTable("seller", "seller", "seller");
 
@@ -77,7 +87,12 @@ public class vendingMachine {
     public void runVendingMachine() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("\nStarting vending machine...");
+        // delete files
+        deleteFiles("reports/availableItems.txt");
+        deleteFiles("reports/summary.txt");
+        deleteFiles("reports/usersList.txt");
+
+        System.out.println(ANSI_PURPLE + "\nStarting vending machine..." + ANSI_RESET);
         ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
 
         lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
@@ -121,26 +136,89 @@ public class vendingMachine {
 
             }
 
-            if (input.toLowerCase().startsWith("login")) {
+            else if (input.toLowerCase().startsWith("login")) {
                 loginHelper(sc);
             }
 
-            if (input.toLowerCase().startsWith("register")) {
+            else if (input.toLowerCase().startsWith("register")) {
                 registerHelper(sc);
             }
 
-            if (input.toLowerCase().startsWith("buyer")) {
+            else if (input.toLowerCase().startsWith("buyer")) {
                 makePurchase(input, sc);
             }
 
-            if (input.toLowerCase().startsWith("seller")) {
-
-                String[] inputList = input.toLowerCase().split(" ");
-                if (inputList.length < 5) {
-                    System.out.println("Missing inputs. Please try again.");
-                    break;
+            else if (input.toLowerCase().startsWith("owner")) {
+                if (currentUser == null || !currentUser.hasOwnerPermissions()) {
+                    System.out.println("Sorry you do not have owner permission.");
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
                 }
-                if (inputList[1].equals("modify")) {
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 2) {
+                    System.out.println("Missing inputs. Please try again.");
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+                if (inputList[1].equals("list")) {
+                    ownerLsUsersTerminal();
+                }
+                else if (inputList[1].equals("remove")){
+                    if (inputList.length < 3) {
+                        System.out.println("Missing inputs. Please try again.");
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
+                    ArrayList<User> users = db.getAllUsers();
+                    boolean suc = false;
+                    for (User i: users) {
+                        if (i.getAccount().equals(inputList[2]) && !inputList[2].equals(currentUser.getAccount())) {
+                            db.removeFromUsersTable(inputList[2]);
+                            System.out.println("Successfully removed the user");
+                            suc = true;
+                            break;
+                        }
+                    }
+                    if (!suc) {
+                        System.out.println("Unsuccessful as an error has occurred. Please try again with valid input");
+                    }
+                }
+            }
+
+            else if (input.toLowerCase().startsWith("seller")) {
+                if (currentUser == null || !currentUser.hasSellerPermissions()) {
+                    System.out.println("ERROR: Sorry you do not have seller permission.");
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 2) {
+                    System.out.println("ERROR: Missing inputs. Please try again.");
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
+                if (inputList[1].equals("list")) {
+                    sellerLs();
+                }
+                else if (inputList[1].equals("summary")) {
+                    sellerSummary();
+                }
+
+                else if (inputList[1].equals("modify")) {
+                    if (inputList.length < 5) {
+                        System.out.println("ERROR: Missing inputs. Please try again.");
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
                     String toModify = inputList[2];
                     String item = inputList[3];
                     String[] newArray = Arrays.copyOfRange(inputList, 4, inputList.length);
@@ -148,40 +226,60 @@ public class vendingMachine {
                     if (toModify.equals("qty")) {
                         db.sellerModifyQuantity(toModify, item, newArray[0]);
                     }
-                    if (toModify.equals("name")) {
+                    else if (toModify.equals("name")) {
                         db.sellerModifyName(toModify, item, newArray);
                         ;
                     }
-                    if (toModify.equals("category")) {
+                    else if (toModify.equals("category")) {
                         db.sellderModifyCategory(toModify, item, newArray);
                         ;
                     }
-                    if (toModify.equals("code")) {
+                    else if (toModify.equals("code")) {
                         if (newArray.length > 1) {
-                            System.out.println("Invalid input, code must be one word");
+                            System.out.println(ANSI_RED + "ERROR: Invalid input, code must be one word" + ANSI_RESET);
                         } else {
                             db.sellderModifyCode(toModify, item, newArray[0]);
                             ;
                         }
                     }
-                    if (toModify.equals("price")) {
+                    else if (toModify.equals("price")) {
                         if (newArray.length > 1) {
-                            System.out.println("Invalid input, please only input 1 price");
+
+                            System.out.println(ANSI_RED + "ERROR: Invalid input, please only input 1 price" + ANSI_RESET);
                         } else {
                             db.sellderModifyPrice(toModify, item, newArray[0]);
                         }
                     }
-
+                    else {
+                        System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
                 }
 
+                else {
+                    System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
             }
 
-            if (input.toLowerCase().startsWith("help")) {
+            else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
             }
 
-            if (input.toLowerCase().equals("exit")) {
+            else if (input.toLowerCase().equals("exit")) {
+                System.out.println(ANSI_PURPLE + "\nShutting down vending machine..." + ANSI_RESET);
                 break;
+            }
+
+            else {
+                System.out.println(ANSI_RED + "Invalid Input. Please try again." + ANSI_RESET);
+                System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                System.out.print("> ");
+                continue;
             }
 
             timer = new Timer();
@@ -201,6 +299,69 @@ public class vendingMachine {
 
         sc.close();
 
+    }
+
+    public void ownerLsUsersTerminal() {
+        System.out.println("----------users list.txt----------");
+        ArrayList<User> users = db.getAllUsers();
+
+        for (User i: users) {
+            String message = String.format("%s | Role : %s",i.getAccount(), i.getRole());
+            System.out.println(message);
+        }
+        System.out.println("-------------------------------------\n");
+    }
+
+    public void ownerLsUsersTxt() {
+        try {
+            FileWriter myWriter = new FileWriter("reports/usersList.txt");
+            ArrayList<User> users = db.getAllUsers();
+
+            for (User i: users) {
+                String message = String.format("%s | Role : %s\r\n",i.getAccount(), i.getRole());
+                myWriter.write(message);
+            }
+
+            myWriter.close();
+
+        } catch (IOException e) {
+            System.out.println( ANSI_RED + "An error occurred." + ANSI_RESET);
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sellerLs() {
+        System.out.println("----------seller_report.txt----------");
+        ArrayList<Item> items = db.getAllItems();
+
+
+        for (Item i: items) {
+            String message = String.format("%s (%s) QTY: %s Price: %s",i.getName(), i.getCode(), i.getQuantity(), i.getPrice());
+            System.out.println(message);
+        }
+
+        System.out.println("-------------------------------------\n");
+    }
+
+    public void sellerSummary() {
+        System.out.println("----------seller_summary.txt----------");
+        ArrayList<Order> orders = db.getOrders();
+        ArrayList<Item> items = db.getAllItems();
+
+        for (Item i: items) {
+            int quant = 0;
+            for (Order o: orders) {
+                if (o.getItemId()== i.getId()) {
+                    quant += o.getQuantity();
+                }
+            }
+
+            String message = String.format("%s (%s) Total sold: %d",i.getName(), i.getCode(), quant);
+            System.out.println(message);
+        }
+
+        System.out.println("--------------------------------------\n");
     }
 
     public void getSellerReport() {
@@ -225,7 +386,9 @@ public class vendingMachine {
                     String message = String.format("%s (%s) | quantity sold 0\r\n", i.getName(), i.getCode());
                     summary.write(message);
                 }
-                // return;
+                summary.close();
+                return;
+
             }
             else {
                 System.out.println("system has been elsed");
@@ -245,7 +408,7 @@ public class vendingMachine {
             summary.close();
             System.out.println("check availableItems.txt and summary.txt for reports");
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
         }
     }
@@ -295,7 +458,7 @@ public class vendingMachine {
             summary.close();            
 
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
         }
     }
@@ -336,7 +499,7 @@ public class vendingMachine {
         User newUser = this.db.insertIntoUsersTable(account, password, "buyer");
 
         if (newUser == null) {
-            System.out.println("Error creating user.");
+            System.out.println(ANSI_RED + "Error creating user." + ANSI_RESET);
         } else {
             System.out.println("Account successfully created!");
             this.currentUser = newUser;
@@ -358,7 +521,7 @@ public class vendingMachine {
 
         if (newUser == null) {
 
-            System.out.println("Invalid username or password!");
+            System.out.println(ANSI_RED + "Invalid username or password!" + ANSI_RESET);
 
         } else {
 
@@ -367,11 +530,28 @@ public class vendingMachine {
 
             if (this.currentUser.hasSellerPermissions()) {
                 getSellerReport();
-                getCashierReport();
+                System.out.println("check availableItems.txt and summary.txt for seller reports");
+            }
+            if  (this.currentUser.hasOwnerPermissions()){
+                ownerLsUsersTxt();
+                System.out.println("check usersList.txt for owner reports");
             }
 
+            else {
+                // delete files
+                deleteFiles("reports/availableItems.txt");
+                deleteFiles("reports/summary.txt");
+                deleteFiles("reports/usersList.txt");
+            }
         }
+    }
 
+    public void deleteFiles(String name) {
+        Path path = FileSystems.getDefault().getPath(name);
+        try {
+            Files.delete(path);
+        } catch (Exception x) {
+        }
     }
 
     public boolean listOptions(String input) {
@@ -415,7 +595,7 @@ public class vendingMachine {
 
         if (help.toLowerCase().equals("all")) {
             System.out.println(
-                    "\n----------------------------------------------------HELP COMMANDS----------------------------------------------------");
+                    "\n-------------------------------------------------HELP COMMANDS-------------------------------------------------");
             System.out.println(
                     "\n1. HELP LIST");
             System.out.println(
@@ -427,48 +607,48 @@ public class vendingMachine {
             System.out.println(
                     "\n5. HELP SELLER");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n--------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("list")) {
             System.out.println(
-                    "\n----------------------------------------------------HELP LIST----------------------------------------------------");
+                    "\n--------------------------------------------------HELP LIST---------------------------------------------------");
             System.out.println(
                     "\nlist [String: categories] : Categories include chocolates, drinks, candies, chips, or all.\n    Example:\n    > list chocolates\n            Mars (MA) QTY: 20 Price: $2\n            M&M (MM) QTY: 10 Price: $5\n            Bounty (BO) QTY: 5 Price: $1\n            Snickers (SN) QTY: 15 Price: 5\n");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n---------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("login")) {
             System.out.println(
-                    "\n----------------------------------------------------HELP LOGIN----------------------------------------------------");
+                    "\n---------------------------------------------------HELP LOGIN---------------------------------------------------");
             System.out.println(
                     "\nlogin : Command to login for an existing user.\n    Example:\n    > login\n            Enter username: myUsername\n            Enter password: myPassword\n            Successfully logged in!\n");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n----------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("register")) {
             System.out.println(
-                    "\n----------------------------------------------------HELP REGISTER----------------------------------------------------");
+                    "\n--------------------------------------------------HELP REGISTER--------------------------------------------------");
             System.out.println(
                     "\nregister : Command for a new user to create an account.\n    Example:\n    > Enter username: myUsername\n            Enter password: myPassword\n            Confirm password: myPassword\n            User successfully created!\n");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n-----------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("buyer")) {
             System.out.println(
                     "\n----------------------------------------------------HELP BUYER----------------------------------------------------");
             System.out.println(
                     "\nbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]: Command allows buyer to purchase an item.\n    Example of a user buying 3 bottles of mineral water using 3x$5 notes and 3x50c coins :\n    > buyer cash 3 mw 50c*3,5*3\n            change 16.50 - 3.75 = $12.75\n            change breakdown ($5x2) ($2x1) (50cx1) (20cx1) (5cx1)\n    Example of a user buying 4 cans of Sprite using a credit card:\n    > buyer card 4 spr\n            card valid, transaction successful!\n");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n------------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("seller")) {
             System.out.println(
-                    "\n----------------------------------------------------HELP SELLER----------------------------------------------------");
+                    "\n---------------------------------------------------HELP SELLER---------------------------------------------------");
             System.out.println(
-                    "\nseller modify [String: itemName] [String: ItemCode] [Int: QTY] [Int: ItemPrice] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
+                    "\nseller modify [qty|price|name|code|category]] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
             System.out.println(
-                    "\nseller list [String: filetype]: Provides the seller with either a csv or txt file for the list of current items.\n    Example:\n    > seller list txt\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
+                    "\nseller list : Provides the seller with txt file for the list of current items and prints into the terminal.\n    Example:\n    > seller list\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
             System.out.println(
-                    "\nseller summary [String: filetype]: Provides seller with the summary item history in csv or txt file.\n    Example:\n    > seller summary csv\n            ----------seller_summary.csv----------\n            Mineral Water (MW) Total sold: 2\n            Mars (MA) Total sold: 7\n            Pringles (PR) Total sold: 4\n            Mentos (MN) Total sold: 5\n            --------------------------------------\n");
+                    "\nseller summary [String: filetype]: Provides seller with the summary item history in txt file and prints into the terminal.\n    Example:\n    > seller summary\n            ----------seller_summary.txt----------\n            Mineral Water (MW) Total sold: 2\n            Mars (MA) Total sold: 7\n            Pringles (PR) Total sold: 4\n            Mentos (MN) Total sold: 5\n            --------------------------------------\n");
             System.out.println(
-                    "\n--------------------------------------------------------------------------------------------------------------------");
+                    "\n------------------------------------------------------------------------------------------------------------------");
         } else {
-            System.out.println("Invalid command. Please try again.");
+            System.out.println(ANSI_RED + "Invalid command. Please try again." + ANSI_RESET);
         }
 
     }
@@ -478,7 +658,7 @@ public class vendingMachine {
         String userInput[] = input.split(" ");
 
         if (userInput.length < 4) {
-            System.out.println("Invalid input! Please make sure your input is in the correct format:");
+            System.out.println(ANSI_RED + "Invalid input! Please make sure your input is in the correct format:" + ANSI_RESET);
             System.out.println(
                     "\tbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]");
             return;
@@ -489,7 +669,7 @@ public class vendingMachine {
         } else if (userInput[1].equals("card")) {
             makeCardPurchase(userInput, sc);
         } else {
-            System.out.println("Invalid payment method!");
+            System.out.println(ANSI_RED + "Invalid payment method!" + ANSI_RESET);
             return;
         }
 
@@ -502,9 +682,9 @@ public class vendingMachine {
         int userId = this.currentUser == null ? -1 : this.currentUser.getId();
 
         if (userInput.length < 5) {
-            System.out.println("Invalid input! Please make sure your input is in the correct format:");
+            System.out.println(ANSI_RED + "Invalid input! Please make sure your input is in the correct format:" + ANSI_RESET);
             System.out.println(
-                    "\tbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]");
+                    ANSI_RED + "\tbuyer [String: paymentMethod] [Int: QTY] [String: itemName] [ (if Cash, Comma Delimiter): num*amount]" + ANSI_RESET);
             return;
         }
 
@@ -512,7 +692,7 @@ public class vendingMachine {
         int itemId = this.db.getItemIdByCode(itemCode);
 
         if (itemId == -1) {
-            System.out.println("The item code provided was invalid. Please list the items to see the item codes.");
+            System.out.println(ANSI_RED + "The item code provided was invalid. Please list the items to see the item codes." + ANSI_RESET);
             return;
         }
 
@@ -528,7 +708,7 @@ public class vendingMachine {
 
             this.db.createCancelledOrder(userId, date, reason);
 
-            System.out.println("The order could not be processed. " + reason);
+            System.out.println( ANSI_RED + "The order could not be processed. " + reason + ANSI_RESET);
 
             logoutUser();
 
@@ -571,8 +751,8 @@ public class vendingMachine {
                 twentyDollars, fiftyDollars, hundredDollars);
 
         if (cash == null) {
-            System.out.println("Invalid cash input Please make sure you are only using valid denominations: ");
-            System.out.println("\t5c, 10c, 20c, 50c, 1, 2, 5, 10, 20, 50, 100");
+            System.out.println(ANSI_RED + "Invalid cash input Please make sure you are only using valid denominations: " + ANSI_RESET);
+            System.out.println(ANSI_RED + "\t5c, 10c, 20c, 50c, 1, 2, 5, 10, 20, 50, 100" + ANSI_RESET);
             return;
         }
 
@@ -618,13 +798,13 @@ public class vendingMachine {
             int res = this.db.createOrder(userId, date, itemId, quantity, totalCash, change, "cash");
 
             if (res < 0) {
-                System.out.println("Error in creating order!");
+                System.out.println(ANSI_RED + "Error in creating order!" + ANSI_RESET);
                 return;
             }
 
             // edit quantity of item in db
             if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
-                System.out.println("Error in updating item quantity!");
+                System.out.println(ANSI_RED + "Error in updating item quantity!" + ANSI_RESET);
                 return;
             }
 
@@ -945,9 +1125,9 @@ public class vendingMachine {
         if (userInput.length > 4) {
 
             if (userInput.length != 6) {
-                System.out.println("Invalid input! Please make sure your input is in the correct format:");
+                System.out.println(ANSI_RED + "Invalid input! Please make sure your input is in the correct format:" + ANSI_RESET);
                 System.out.println(
-                        "\tbuyer card [Int: QTY] [String: itemName] [String: cardName] [Int: cardNumber]");
+                        ANSI_RED + "\tbuyer card [Int: QTY] [String: itemName] [String: cardName] [Int: cardNumber]" + ANSI_RESET);
                 return;
             }
 
@@ -1002,7 +1182,7 @@ public class vendingMachine {
 
                 this.db.createCancelledOrder(userId, date, reason);
 
-                System.out.println("The order could not be processed. " + reason);
+                System.out.println(ANSI_RED + "The order could not be processed. " + reason + ANSI_RESET);
 
                 logoutUser();
 
@@ -1016,7 +1196,7 @@ public class vendingMachine {
         int itemId = this.db.getItemIdByCode(itemCode);
 
         if (itemId == -1) {
-            System.out.println("The item code provided was invalid. Please list the items to see the item codes.");
+            System.out.println(ANSI_RED + "The item code provided was invalid. Please list the items to see the item codes." + ANSI_RESET);
             return;
         }
 
@@ -1030,7 +1210,7 @@ public class vendingMachine {
 
             this.db.createCancelledOrder(userId, date, reason);
 
-            System.out.println("The order could not be processed. " + reason);
+            System.out.println(ANSI_RED + "The order could not be processed. " + reason + ANSI_RESET);
 
             logoutUser();
 
@@ -1059,13 +1239,13 @@ public class vendingMachine {
         int res = this.db.createOrder(userId, date, itemId, quantity, totalCost, 0, "card");
 
         if (res < 0) {
-            System.out.println("Error in creating order!");
+            System.out.println(ANSI_RED + "Error in creating order!" + ANSI_RESET);
             return;
         }
 
         // edit quantity of item in db
         if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
-            System.out.println("Error in updating item quantity!");
+            System.out.println(ANSI_RED + "Error in updating item quantity!" + ANSI_RESET);
             return;
         }
 
@@ -1084,15 +1264,15 @@ public class vendingMachine {
                 int res = this.currentUser.associateCardWithUser(card, this.db);
 
                 if (res == -1) {
-                    System.out.println("Error associating card with user.");
+                    System.out.println(ANSI_RED + "Error associating card with user." + ANSI_RESET);
                     return -1;
                 } else if (res == -2) {
                     System.out.println(
-                            "The card you have provided is invalid. You will not be able to make purchases until you provide a valid card.");
+                            ANSI_RED + "The card you have provided is invalid. You will not be able to make purchases until you provide a valid card." + ANSI_RESET);
                     return -2;
                 } else if (res == 2) {
                     System.out.println(
-                            "The card you have provided is invalid. However, you have an existing card stored on your account. This card will be used for this transaction instead.");
+                            ANSI_RED + "The card you have provided is invalid. However, you have an existing card stored on your account. This card will be used for this transaction instead." + ANSI_RESET);
                     return 2;
                 } else {
                     System.out.println("Card successfully associated with user.");
