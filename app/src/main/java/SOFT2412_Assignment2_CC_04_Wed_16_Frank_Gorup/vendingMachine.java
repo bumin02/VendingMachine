@@ -587,7 +587,7 @@ public class vendingMachine {
             System.out.println(
                     "\n---------------------------------------------------HELP SELLER---------------------------------------------------");
             System.out.println(
-                    "\nseller modify [String: itemName] [String: ItemCode] [Int: QTY] [Int: ItemPrice] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
+                    "\nseller modify [qty|price|name|code|category]] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller chaning the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
             System.out.println(
                     "\nseller list : Provides the seller with txt file for the list of current items and prints into the terminal.\n    Example:\n    > seller list\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
             System.out.println(
