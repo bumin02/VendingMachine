@@ -17,6 +17,10 @@ public class Database {
 
   private static final String dbName = "vendingMachine.db";
   private static final String dbURL = "jdbc:sqlite:" + dbName;
+  public static final String ANSI_RED = "\u001B[31m";
+  public static final String ANSI_YELLOW = "\u001B[33m";
+  public static final String ANSI_PURPLE = "\u001B[35m";
+  public static final String ANSI_RESET = "\u001B[0m";
 
   /**
    * This method creates the DB.
@@ -738,21 +742,21 @@ public class Database {
     try {
       int qty = Integer.parseInt(changeInto);
       if (qty > 15){
-        System.out.println("ERROR: Quantity added is over limit (15). Unable to process request.");
+        System.out.println(ANSI_RED + "ERROR: Quantity added is over limit (15). Unable to process request." + ANSI_RESET);
         return;
       }
       else if(qty < 0){
-        System.out.println("ERROR: Quantity cannot be smaller than 0. Unable to process request.");
+        System.out.println(ANSI_RED + "ERROR: Quantity cannot be smaller than 0. Unable to process request." + ANSI_RESET);
         return;
       }
       int res = updateItemQuantity(itemCode, qty);
       if (res > 0) {
         System.out.println("Item quantity updated successfully");
       } else {
-        System.out.println("ERROR: Unable to update item quantity");
+        System.out.println(ANSI_RED + "ERROR: Unable to update item quantity" + ANSI_RESET);
       }
     } catch (NumberFormatException e) {
-      System.out.println("ERROR: Invalid quantity");
+      System.out.println(ANSI_RED + "ERROR: Invalid quantity" + ANSI_RESET);
       return;
     }
 
@@ -785,7 +789,7 @@ public class Database {
     int itemCode = getItemIdByCode(item.toLowerCase());
 
     if (itemCode <= 0) {
-      System.out.println("ERROR: Invalid item code");
+      System.out.println(ANSI_RED + "ERROR: Invalid item code" + ANSI_RESET);
       return;
     }
 
@@ -803,7 +807,7 @@ public class Database {
     if (res > 0) {
       System.out.println("Item name updated successfully");
     } else {
-      System.out.println("ERROR: Unable to update item name");
+      System.out.println(ANSI_RED + "ERROR: Unable to update item name" + ANSI_RESET);
     }
 
   }
@@ -834,7 +838,7 @@ public class Database {
   public void sellderModifyCategory(String toModify, String item, String[] category) {
     int itemCode = getItemIdByCode(item.toLowerCase());
     if (itemCode <= 0) {
-      System.out.println("ERROR: Invalid item code");
+      System.out.println(ANSI_RED + "ERROR: Invalid item code" + ANSI_RESET);
       return;
     }
     String fullCategory = "";
@@ -849,7 +853,7 @@ public class Database {
     if (res > 0) {
       System.out.println("Item category updated successfully");
     } else {
-      System.out.println("ERROR: Unable to update item category");
+      System.out.println(ANSI_RED + "ERROR: Unable to update item category" + ANSI_RESET);
     }
   }
 
@@ -879,14 +883,14 @@ public class Database {
   public void sellderModifyCode(String toModify, String item, String Code) {
     int itemCode = getItemIdByCode(item.toLowerCase());
     if (itemCode <= 0) {
-      System.out.println("ERROR: Invalid item code");
+      System.out.println(ANSI_RED + "ERROR: Invalid item code" + ANSI_RESET);
       return;
     }
     int res = updateItemCode(itemCode, Code);
     if (res > 0) {
       System.out.println("Item code updated successfully");
     } else {
-      System.out.println("ERROR: Unable to update item code");
+      System.out.println(ANSI_RED + "ERROR: Unable to update item code" + ANSI_RESET);
     }
   }
 
@@ -916,19 +920,19 @@ public class Database {
   public void sellderModifyPrice(String toModify, String item, String Price) {
     int itemCode = getItemIdByCode(item.toLowerCase());
     if (itemCode <= 0) {
-      System.out.println("ERROR: Invalid item code");
+      System.out.println(ANSI_RED + "ERROR: Invalid item code" + ANSI_RESET);
       return;
     }
     Double priceDouble = Double.parseDouble(Price);
     if(priceDouble < 0){
-      System.out.println("ERROR: Price must be greater than 0, unable to process request.");
+      System.out.println(ANSI_RED + "ERROR: Price must be greater than 0, unable to process request." + ANSI_RESET);
       return;
     }
     int res = updateItemPrice(itemCode, Price);
     if (res > 0) {
       System.out.println("Item price updated successfully");
     } else {
-      System.out.println("ERROR: Unable to update item price");
+      System.out.println(ANSI_RED + "ERROR: Unable to update item price" + ANSI_RESET);
     }
   }
 

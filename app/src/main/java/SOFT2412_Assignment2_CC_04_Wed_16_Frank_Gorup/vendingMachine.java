@@ -251,7 +251,7 @@ public class vendingMachine {
                         }
                     }
                     else {
-                        System.out.println("ERROR: Invalid inputs. Please try again.");
+                        System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
@@ -259,7 +259,7 @@ public class vendingMachine {
                 }
 
                 else {
-                    System.out.println("ERROR: Invalid inputs. Please try again.");
+                    System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
@@ -276,7 +276,7 @@ public class vendingMachine {
             }
 
             else {
-                System.out.println("Invalid Input. Please try again.");
+                System.out.println(ANSI_RED + "Invalid Input. Please try again." + ANSI_RESET);
                 System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                 System.out.print("> ");
                 continue;
@@ -325,7 +325,7 @@ public class vendingMachine {
             myWriter.close();
 
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println( ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
         }
 
@@ -405,7 +405,7 @@ public class vendingMachine {
             summary.close();
             System.out.println("check availableItems.txt and summary.txt for reports");
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
         }
     }
@@ -446,7 +446,7 @@ public class vendingMachine {
         User newUser = this.db.insertIntoUsersTable(account, password, "buyer");
 
         if (newUser == null) {
-            System.out.println("Error creating user.");
+            System.out.println(ANSI_RED + "Error creating user." + ANSI_RESET);
         } else {
             System.out.println("Account successfully created!");
             this.currentUser = newUser;
@@ -743,13 +743,13 @@ public class vendingMachine {
             int res = this.db.createOrder(userId, date, itemId, quantity, totalCash, change, "cash");
 
             if (res < 0) {
-                System.out.println("Error in creating order!");
+                System.out.println(ANSI_RED + "Error in creating order!" + ANSI_RESET);
                 return;
             }
 
             // edit quantity of item in db
             if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
-                System.out.println("Error in updating item quantity!");
+                System.out.println(ANSI_RED + "Error in updating item quantity!" + ANSI_RESET);
                 return;
             }
 
@@ -1184,13 +1184,13 @@ public class vendingMachine {
         int res = this.db.createOrder(userId, date, itemId, quantity, totalCost, 0, "card");
 
         if (res < 0) {
-            System.out.println("Error in creating order!");
+            System.out.println(ANSI_RED + "Error in creating order!" + ANSI_RESET);
             return;
         }
 
         // edit quantity of item in db
         if (this.db.updateItemQuantity(itemId, this.db.getItemQuantityByCode(itemCode) - quantity) != itemId) {
-            System.out.println("Error in updating item quantity!");
+            System.out.println(ANSI_RED + "Error in updating item quantity!" + ANSI_RESET);
             return;
         }
 
@@ -1209,7 +1209,7 @@ public class vendingMachine {
                 int res = this.currentUser.associateCardWithUser(card, this.db);
 
                 if (res == -1) {
-                    System.out.println("Error associating card with user.");
+                    System.out.println(ANSI_RED + "Error associating card with user." + ANSI_RESET);
                     return -1;
                 } else if (res == -2) {
                     System.out.println(
