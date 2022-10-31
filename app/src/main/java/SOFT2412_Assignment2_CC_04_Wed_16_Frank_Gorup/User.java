@@ -47,7 +47,7 @@ public class User {
 
         if (valid) {
 
-            int res = db.associateCardWithUser(card.getId(), this.getId());
+            int res = db.associateCardWithUser(card.getId(), this.id);
 
             if (res != 1) {
                 return -1;

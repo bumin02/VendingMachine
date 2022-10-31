@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 mineral Water (mw): category: drinks, price: 3.0, quantity: 20
 sprite (sp): category: drinks, price: 5.0, quantity: 10
+=======
+mineral Water (mw): category: drinks, price: 3.0, quantity: 3
+sprite (sp): category: drinks, price: 5.0, quantity: 1
+>>>>>>> main
 coca cola (cc): category: drinks, price: 5.0, quantity: 10
 pepsi (pe): category: drinks, price: 4.0, quantity: 10
 juice (ju): category: drinks, price: 3.5, quantity: 10

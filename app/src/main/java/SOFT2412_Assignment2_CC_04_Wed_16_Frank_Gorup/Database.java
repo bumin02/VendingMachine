@@ -188,9 +188,7 @@ public class Database {
       statement.setInt(1, cardId);
       statement.setInt(2, userId);
 
-      statement.executeUpdate();
-
-      return 1;
+      return statement.executeUpdate();
 
     } catch (SQLException e) {
 
@@ -332,10 +330,11 @@ public class Database {
       // create a list of cards from the result set
       while (rs.next()) {
 
+        int id = rs.getInt("id");
         String number = rs.getString("number");
         String name = rs.getString("name");
 
-        Card card = new Card(name, number);
+        Card card = new Card(id, name, number);
 
         cards.add(card);
 
@@ -903,8 +902,6 @@ public class Database {
       System.out.println("Unable to update item price");
     }
   }
-
- 
 
   public ArrayList<Order> getOrders() {
     ArrayList<Order> orders = new ArrayList<Order>();
