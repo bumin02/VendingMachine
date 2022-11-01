@@ -223,7 +223,7 @@ public class vendingMachine {
 
             else if (input.toLowerCase().startsWith("seller")) {
                 if (currentUser == null || !currentUser.hasSellerPermissions()) {
-                    System.out.println("ERROR: Sorry you do not have seller permission.");
+                    System.out.println("ERROR: Sorry you do not have seller permissions.");
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
@@ -299,6 +299,72 @@ public class vendingMachine {
             }
 
             // create functionality for cashier here
+            else if (input.toLowerCase().startsWith("cashier")) {
+                if (currentUser == null || !currentUser.hasCashierPermissions()) {
+                    System.out.println(ANSI_RED + "ERROR: Sorry you do not have cashier permissions." + ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }   
+
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 2) {
+                    System.out.println(ANSI_RED + "ERROR: Missing inputs. Please try again." + ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
+                String option = inputList[1];
+
+                if (option.toLowerCase().equals("modify")) {
+
+                    if (inputList.length <= 3) {
+                        System.out.println(ANSI_RED + "ERROR: Missing inputs for cashier modify. Please try again." + ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
+                    String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
+
+                    String denomination = inputList[2];
+                    String newQuant = inputList[3];
+
+                    if (Arrays.asList(denominations).contains(denomination)) {
+                        if (isInteger(newQuant)) {
+                            // modify denomination quantity
+                            int intNewQuant = Integer.parseInt(newQuant);
+                            if (intNewQuant < 0) {
+                                System.out.println(ANSI_RED + "ERROR: New quantity cannot be negative. Please try again." + ANSI_RESET);
+                                System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                                System.out.print("> ");
+                                continue;
+                            }
+                            db.updateChangeForDenomination(denomination, intNewQuant);
+                        }
+                        else {
+                            System.out.println(ANSI_RED + "ERROR: Wrong input for modifying denomination new quantity. Please try again." + ANSI_RESET);
+                        }
+                    }
+                    else {
+                        System.out.println(ANSI_RED + "ERROR: Invalid denomination. Please try again." + ANSI_RESET);
+                    }
+
+                }
+                else if (option.toLowerCase().equals("list")) {
+                    
+                }
+                else if (option.toLowerCase().equals("summary")) {
+                    
+                }       
+                else {
+                    System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }     
+            }
 
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
@@ -333,6 +399,18 @@ public class vendingMachine {
 
         sc.close();
 
+    }
+
+    public static boolean isInteger(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            int i = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
     public void ownerLsUsersTerminal() {
@@ -462,7 +540,7 @@ public class vendingMachine {
             FileWriter writeChange = new FileWriter("reports/cashierAvailableChange.txt");
             ArrayList<Item> items = db.getAllItems();
 
-            String[] denominations = {"100", "50", "20", "10", "5", "1", "50c", "20c", "10c", "5c"};
+            String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
 
             for (String i : denominations) {
                 int denominationQuantity = db.getAmountOfChangeForDenomination(i);

@@ -3,8 +3,9 @@ Demonination: $50 | Quantity: 10
 Demonination: $20 | Quantity: 9
 Demonination: $10 | Quantity: 8
 Demonination: $5 | Quantity: 8
-Demonination: $1 | Quantity: 0
-Demonination: 50c | Quantity: 0
+Demonination: $2 | Quantity: 0
+Demonination: $1 | Quantity: 15
+Demonination: 50c | Quantity: 12
 Demonination: 20c | Quantity: 0
 Demonination: 10c | Quantity: 0
 Demonination: 5c | Quantity: 10
