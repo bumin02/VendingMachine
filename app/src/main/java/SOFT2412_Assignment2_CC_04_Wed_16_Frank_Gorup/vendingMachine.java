@@ -42,7 +42,6 @@ public class vendingMachine {
     public void initialSetup() {
         deleteFiles("./src/vendingMachine.db");
 
-
         // fake user
         this.db.insertIntoUsersTable("owner", "owner", "owner");
         this.db.insertIntoUsersTable("test", "test", "buyer");
