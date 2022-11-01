@@ -31,8 +31,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-//       initialSetup();
-        initialSetup();
+        // initialSetup();
     }
 
     public User getCurrentUser() {
@@ -48,6 +47,7 @@ public class vendingMachine {
         this.db.insertIntoUsersTable("owner", "owner", "owner");
         this.db.insertIntoUsersTable("test", "test", "buyer");
         this.db.insertIntoUsersTable("seller", "seller", "seller");
+        this.db.insertIntoUsersTable("cashier", "cashier", "cashier");
 
         // dummy items with quantities and prices defined
         this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
@@ -413,7 +413,6 @@ public class vendingMachine {
             ArrayList<Order> orders = db.getOrders();
 
             if (orders == null) {
-                System.out.println("system has been nulled");
                 for (Item i : items) {
                     String message = String.format("%s (%s) | quantity sold 0\r\n", i.getName(), i.getCode());
                     summary.write(message);
@@ -423,13 +422,11 @@ public class vendingMachine {
 
             }
             else {
-                System.out.println("system has been elsed");
                 for (Item i : items) {
                     int quant = 0;
                     for (Order o : orders) {
                         if (o.getItemId() == i.getId()) {
                             quant += o.getQuantity();
-                            System.out.println(i.getName() + quant);
                         }
                     }
                     String message = String.format("%s (%s) | quantity sold %s\n", i.getName(), i.getCode(), quant);
@@ -438,7 +435,7 @@ public class vendingMachine {
             }
 
             summary.close();
-            System.out.println("check availableItems.txt and summary.txt for reports");
+            
         } catch (IOException e) {
             System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
@@ -469,20 +466,20 @@ public class vendingMachine {
             FileWriter summary = new FileWriter("reports/cashierSummary.txt");
             ArrayList<Order> orders = this.db.getOrders();  
 
-            ArrayList<Order> lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
-            lastFiveOrders = this.db.getFiveMostRecentOrders(this.currentUser == null ? -1 : this.currentUser.getId());
-            lastFiveOrders = this.db.getFiveMostRecentOrders(-1);
+            String purchasedItemCode = "-";
 
-            if (lastFiveOrders == null) {
-                System.out.println("No orders have been placed");
+            if (orders == null) {
                 summary.write("---------- no orders have been placed ----------");
             }
 
             else {
-                System.out.println("Order(s) have been recorded:");
-                for (Order i : lastFiveOrders) {
-                    String message = String.format("%s (%s) | Paid: %s Returned: %s Method: %s\r\n", i.getDate(), i.getId(), i.getAmountPaid(), i.getChange(), i.getPaymentMethod());
-                    System.out.print(message);
+                for (Order order : orders) {
+                    for (Item i : items) {
+                        if (i.getId() == order.getItemId()) {
+                            purchasedItemCode = i.getCode();
+                        }
+                    }
+                    String message = String.format("%s (%s) | Paid: %s, Returned: %s, Method: %s\r\n", order.getDate(), purchasedItemCode, order.getAmountPaid(), order.getChange(), order.getPaymentMethod());
                     summary.write(message);
                 }
             }
@@ -564,7 +561,11 @@ public class vendingMachine {
                 getSellerReport();
                 System.out.println("check availableItems.txt and summary.txt for seller reports");
             }
-            if  (this.currentUser.hasOwnerPermissions()){
+            else if (this.currentUser.hasCashierPermissions()) {
+                getCashierReport();
+                System.out.println("check cashierAvailableChange.txt and cashierSummary.txt for cashier reports");
+            }
+            else if  (this.currentUser.hasOwnerPermissions()){
                 ownerLsUsersTxt();
                 System.out.println("check usersList.txt for owner reports");
             }

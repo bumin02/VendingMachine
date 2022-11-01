@@ -948,11 +948,11 @@ public class Database {
       while (result.next()) {
         int id = result.getInt("id");
         int userId = result.getInt("userId");
-        LocalDate date = result.getDate("date").toLocalDate();
+        LocalDate date = LocalDate.parse(result.getString("date"));
         int itemId = result.getInt("itemId");
         int quantity = result.getInt("quantity");
         double amountPaid = result.getDouble("amountPaid");
-        double change = result.getDouble("change");
+        double change = result.getDouble("returnedChange");
         String paymentMethod = result.getString("paymentMethod");
 
         Order order = new Order(id, userId, date, itemId, quantity, amountPaid, change, paymentMethod);

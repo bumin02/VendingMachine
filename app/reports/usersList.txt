@@ -1,3 +1,0 @@
-owner | Role : owner
-test | Role : buyer
-seller | Role : seller
