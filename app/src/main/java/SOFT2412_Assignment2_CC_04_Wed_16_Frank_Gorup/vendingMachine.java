@@ -11,6 +11,8 @@ import java.util.*;
 import java.io.FileWriter; // Import the FileWriter class
 import java.io.IOException; // Import the IOException class to handle errors
 
+
+
 public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
@@ -146,6 +148,49 @@ public class vendingMachine {
 
             else if (input.toLowerCase().startsWith("buyer")) {
                 makePurchase(input, sc);
+            }
+
+            else if (input.toLowerCase().startsWith("cashier")) {
+                if (currentUser == null || !currentUser.getRole().equals("cashier")) {
+                    System.out.println(ANSI_RED +"Sorry you do not have cashier permission."+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 2) {
+                    System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+                if (inputList[1].equals("modify")) {
+                    if (inputList.length < 4) {
+                        System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+                    int quant;
+                    try{
+                        quant = Integer.parseInt(inputList[3]);
+                    }catch (Exception e) {
+                        System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
+                    cashReplenishment(inputList[2], quant);
+                }
+                else {
+                    System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
             }
 
             else if (input.toLowerCase().startsWith("owner")) {
@@ -302,6 +347,10 @@ public class vendingMachine {
 
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
+            }
+
+            else if (input.toLowerCase().startsWith("logout")) {
+                logoutUser();
             }
 
             else if (input.toLowerCase().equals("exit")) {
@@ -509,19 +558,19 @@ public class vendingMachine {
 
     public int cashReplenishment(String denomination, int quantity) {
         if (quantity < 0) {
-            System.out.println("quantity cannot be negative.");
+            System.out.println(ANSI_RED +"quantity cannot be negative."+ ANSI_RESET);
             return 0;
         }
 
         if (db.getAmountOfChangeForDenomination(denomination) == 0) {
-            System.out.println("cash denomination does not exist.");
+            System.out.println(ANSI_RED +"cash denomination does not exist."+ ANSI_RESET);
             return 0;
         }
 
         if (db.insertIntoChangeTable(denomination, quantity) == 0) {
             return 0;
         } else {
-            System.out.println("SUCCESS");
+            System.out.printf("Success! There are now %dx%s in the vending machine%n", quantity, denomination);
             return 1;
         }
     }
@@ -1321,6 +1370,13 @@ public class vendingMachine {
 
     public void logoutUser() {
         this.currentUser = null;
+        System.out.println("Logged out");
+
+        deleteFiles("reports/availableItems.txt");
+        deleteFiles("reports/summary.txt");
+        deleteFiles("reports/usersList.txt");
+        deleteFiles("reports/cashierAvailableChange.txt");
+        deleteFiles("reports/cashierSummary.txt");
     }
 
 }
