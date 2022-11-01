@@ -184,6 +184,15 @@ public class vendingMachine {
 
                     cashReplenishment(inputList[2], quant);
                 }
+
+                else if (inputList[1].equals("list")) {
+                    cashierLs();
+                }
+
+                else if (inputList[1].equals("summary")) {
+                    cashierSummary();
+                } 
+
                 else {
                     System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
@@ -343,25 +352,6 @@ public class vendingMachine {
                 }
             }
 
-            else if (input.toLowerCase().startsWith("cashier")) {
-
-                String[] inputList = input.toLowerCase().split(" ");
-                String option = inputList[1];
-
-                if (option.toLowerCase().equals("list")) {
-                    cashierLs();
-                }
-                else if (option.toLowerCase().equals("summary")) {
-                    cashierSummary();
-                }       
-                else {
-                    System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
-                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
-                    System.out.print("> ");
-                    continue;
-                }     
-            }
-
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
             }
@@ -454,7 +444,7 @@ public class vendingMachine {
             System.out.println(message);
         }
 
-        System.out.println("-------------------------------------\n");
+        System.out.println("-------------------------------------");
     }
 
     public void sellerSummary() {
@@ -474,7 +464,7 @@ public class vendingMachine {
             System.out.println(message);
         }
 
-        System.out.println("--------------------------------------\n");
+        System.out.println("--------------------------------------");
     }
 
     public void getSellerReport() {
