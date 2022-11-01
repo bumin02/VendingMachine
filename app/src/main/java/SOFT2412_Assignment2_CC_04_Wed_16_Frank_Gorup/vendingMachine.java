@@ -298,65 +298,16 @@ public class vendingMachine {
                 }
             }
 
-            // create functionality for cashier here
             else if (input.toLowerCase().startsWith("cashier")) {
-                if (currentUser == null || !currentUser.hasCashierPermissions()) {
-                    System.out.println(ANSI_RED + "ERROR: Sorry you do not have cashier permissions." + ANSI_RESET);
-                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
-                    System.out.print("> ");
-                    continue;
-                }   
 
                 String[] inputList = input.toLowerCase().split(" ");
-                if (inputList.length < 2) {
-                    System.out.println(ANSI_RED + "ERROR: Missing inputs. Please try again." + ANSI_RESET);
-                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
-                    System.out.print("> ");
-                    continue;
-                }
-
                 String option = inputList[1];
 
-                if (option.toLowerCase().equals("modify")) {
-
-                    if (inputList.length <= 3) {
-                        System.out.println(ANSI_RED + "ERROR: Missing inputs for cashier modify. Please try again." + ANSI_RESET);
-                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
-                        System.out.print("> ");
-                        continue;
-                    }
-
-                    String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
-
-                    String denomination = inputList[2];
-                    String newQuant = inputList[3];
-
-                    if (Arrays.asList(denominations).contains(denomination)) {
-                        if (isInteger(newQuant)) {
-                            // modify denomination quantity
-                            int intNewQuant = Integer.parseInt(newQuant);
-                            if (intNewQuant < 0) {
-                                System.out.println(ANSI_RED + "ERROR: New quantity cannot be negative. Please try again." + ANSI_RESET);
-                                System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
-                                System.out.print("> ");
-                                continue;
-                            }
-                            db.updateChangeForDenomination(denomination, intNewQuant);
-                        }
-                        else {
-                            System.out.println(ANSI_RED + "ERROR: Wrong input for modifying denomination new quantity. Please try again." + ANSI_RESET);
-                        }
-                    }
-                    else {
-                        System.out.println(ANSI_RED + "ERROR: Invalid denomination. Please try again." + ANSI_RESET);
-                    }
-
-                }
-                else if (option.toLowerCase().equals("list")) {
-                    
+                if (option.toLowerCase().equals("list")) {
+                    cashierLs();
                 }
                 else if (option.toLowerCase().equals("summary")) {
-                    
+                    cashierSummary();
                 }       
                 else {
                     System.out.println(ANSI_RED + "ERROR: Invalid inputs. Please try again." + ANSI_RESET);
@@ -399,18 +350,6 @@ public class vendingMachine {
 
         sc.close();
 
-    }
-
-    public static boolean isInteger(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            int i = Integer.parseInt(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
     }
 
     public void ownerLsUsersTerminal() {
@@ -532,6 +471,50 @@ public class vendingMachine {
         } catch (IOException e) {
             System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
+        }
+    }
+
+    public void cashierLs() {
+        System.out.println("----------cashier_report.txt----------");
+        ArrayList<Item> items = db.getAllItems();
+
+        String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
+
+        for (String i : denominations) {
+            int denominationQuantity = db.getAmountOfChangeForDenomination(i);
+            if (i.charAt(i.length()-1) == 'c') {
+                String message = String.format("Demonination: " + i + " | Quantity: " + denominationQuantity);
+                System.out.println(message);
+            }
+            else { // if denomination if not a coin, add a $ in front of it
+                String message = String.format("Demonination: $" + i + " | Quantity: " + denominationQuantity);
+                System.out.println(message);
+            }
+        }
+        System.out.println("-------------------------------------");
+    }
+
+    public void cashierSummary() {
+
+        ArrayList<Order> orders = this.db.getOrders();  
+        String purchasedItemCode = "-";
+
+        if (orders == null) {
+            System.out.println("---------- no orders have been placed ----------");
+        }
+
+        else {
+            System.out.println("-------------------cashier_summary---------------------");
+            for (Order order : orders) {
+                for (Item i : items) {
+                    if (i.getId() == order.getItemId()) {
+                        purchasedItemCode = i.getCode();
+                    }
+                }
+                String message = String.format("%s (%s) | Paid: %s, Returned: %s, Method: %s\r", order.getDate(), purchasedItemCode, order.getAmountPaid(), order.getChange(), order.getPaymentMethod());
+                System.out.println(message);
+            }
+            System.out.println("--------------------------------------------------------");
         }
     }
 

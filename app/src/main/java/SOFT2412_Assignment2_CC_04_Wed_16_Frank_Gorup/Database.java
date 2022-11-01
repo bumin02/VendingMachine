@@ -721,14 +721,6 @@ public class Database {
       statement.setString(2, denomination);
 
       statement.execute();
-      // cents format
-      if (denomination.contains("c")) {
-        System.out.println("Success! There are now " + newQuantity + "x" + denomination + " in the vending machine");
-      }
-      // dollars format
-      else {
-        System.out.println("Success! There are now " + newQuantity + "x$" + denomination + " in the vending machine");
-      }
 
       return newQuantity;
 
