@@ -952,7 +952,7 @@ public class Database {
         int itemId = result.getInt("itemId");
         int quantity = result.getInt("quantity");
         double amountPaid = result.getDouble("amountPaid");
-        double change = result.getDouble("change");
+        double change = result.getDouble("returnedChange");
         String paymentMethod = result.getString("paymentMethod");
 
         Order order = new Order(id, userId, date, itemId, quantity, amountPaid, change, paymentMethod);

@@ -31,8 +31,7 @@ public class vendingMachine {
         this.items = new ArrayList<>();
 
         // for setup if needed
-//       initialSetup();
-        initialSetup();
+        // initialSetup();
     }
 
     public User getCurrentUser() {
@@ -43,11 +42,11 @@ public class vendingMachine {
     public void initialSetup() {
         deleteFiles("./src/vendingMachine.db");
 
-
         // fake user
         this.db.insertIntoUsersTable("owner", "owner", "owner");
         this.db.insertIntoUsersTable("test", "test", "buyer");
         this.db.insertIntoUsersTable("seller", "seller", "seller");
+        this.db.insertIntoUsersTable("cashier", "cashier", "cashier");
 
         // dummy items with quantities and prices defined
         this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
@@ -449,7 +448,57 @@ public class vendingMachine {
             }
 
             summary.close();
-            System.out.println("check availableItems.txt and summary.txt for reports");
+            
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
+            e.printStackTrace();
+        }
+    }
+
+    public void getCashierReport() {
+        try {
+            FileWriter writeChange = new FileWriter("reports/cashierAvailableChange.txt");
+            ArrayList<Item> items = db.getAllItems();
+
+            String[] denominations = {"100", "50", "20", "10", "5", "1", "50c", "20c", "10c", "5c"};
+
+            for (String i : denominations) {
+                int denominationQuantity = db.getAmountOfChangeForDenomination(i);
+                if (i.charAt(i.length()-1) == 'c') {
+                    String message = String.format("Demonination: " + i + " | Quantity: " + denominationQuantity + "\n");
+                    writeChange.write(message);
+                }
+                else { // if denomination if not a coin, add a $ in front of it
+                    String message = String.format("Demonination: $" + i + " | Quantity: " + denominationQuantity + "\n");
+                    writeChange.write(message);
+                }
+            }
+
+            writeChange.close();
+
+            FileWriter summary = new FileWriter("reports/cashierSummary.txt");
+            ArrayList<Order> orders = this.db.getOrders();  
+
+            String purchasedItemCode = "-";
+
+            if (orders == null) {
+                summary.write("---------- no orders have been placed ----------");
+            }
+
+            else {
+                for (Order order : orders) {
+                    for (Item i : items) {
+                        if (i.getId() == order.getItemId()) {
+                            purchasedItemCode = i.getCode();
+                        }
+                    }
+                    String message = String.format("%s (%s) | Paid: %s, Returned: %s, Method: %s\r\n", order.getDate(), purchasedItemCode, order.getAmountPaid(), order.getChange(), order.getPaymentMethod());
+                    summary.write(message);
+                }
+            }
+
+            summary.close();            
+
         } catch (IOException e) {
             System.out.println(ANSI_RED + "An error occurred." + ANSI_RESET);
             e.printStackTrace();
@@ -525,7 +574,11 @@ public class vendingMachine {
                 getSellerReport();
                 System.out.println("check availableItems.txt and summary.txt for seller reports");
             }
-            if  (this.currentUser.hasOwnerPermissions()){
+            else if (this.currentUser.hasCashierPermissions()) {
+                getCashierReport();
+                System.out.println("check cashierAvailableChange.txt and cashierSummary.txt for cashier reports");
+            }
+            else if  (this.currentUser.hasOwnerPermissions()){
                 ownerLsUsersTxt();
                 //onwerLsCancelledOrders();
                 System.out.println("check usersList.txt for owner reports");
@@ -708,7 +761,9 @@ public class vendingMachine {
         }
 
         int quantity = Integer.parseInt(userInput[2]);
+        // System.out.println("YOU WANT TO PURCHASE " + quantity + " ITEMS");
         int currentItemQuantity = this.db.getItemQuantityByCode(itemCode);
+        
 
         if (quantity <= 0) {
 
