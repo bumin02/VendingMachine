@@ -298,6 +298,8 @@ public class vendingMachine {
                 }
             }
 
+            // create functionality for cashier here
+
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
             }
@@ -654,9 +656,9 @@ public class vendingMachine {
             System.out.println(
                     "\n5. HELP SELLER");
             System.out.println(
-                    "\n6. HELP OWNER");
-            System.out.println(
                     "\n6. HELP CASHIER");
+            System.out.println(
+                    "\n7. HELP OWNER");
 
             System.out.println(
                     "\n--------------------------------------------------------------------------------------------------------------");
@@ -692,21 +694,31 @@ public class vendingMachine {
             System.out.println(
                     "\n---------------------------------------------------HELP SELLER---------------------------------------------------");
             System.out.println(
-                    "\nseller modify [qty|price|name|code|category]] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller changing the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
+                    "\nseller modify [qty|price|name|code|category] [String: ItemCode] [QTY | price | name | code | category] : Seller is able to modify items.\n    Example of a seller changing the item quantity of coke:\n    > seller modify qty cc 10\n            Success!\n");
             System.out.println(
                     "\nseller list : Provides the seller with txt file for the list of current items and prints into the terminal.\n    Example:\n    > seller list\n            ----------seller_report.txt----------\n            Mineral Water (MW) QTY: 20 Price: $2\n            Mars (MA) QTY: 12 Price: $5\n            Pringles (PR) QTY: 10 Price: $6\n            Mentos (MN) QTY: 15 Price: $3\n            -------------------------------------\n");
             System.out.println(
-                    "\nseller summary [String: filetype]: Provides seller with the summary item history in txt file and prints into the terminal.\n    Example:\n    > seller summary\n            ----------seller_summary.txt----------\n            Mineral Water (MW) Total sold: 2\n            Mars (MA) Total sold: 7\n            Pringles (PR) Total sold: 4\n            Mentos (MN) Total sold: 5\n            --------------------------------------\n");
+                    "\nseller summary : Provides seller with the summary item history in txt file and prints into the terminal.\n    Example:\n    > seller summary\n            ----------seller_summary.txt----------\n            Mineral Water (MW) Total sold: 2\n            Mars (MA) Total sold: 7\n            Pringles (PR) Total sold: 4\n            Mentos (MN) Total sold: 5\n            --------------------------------------\n");
             System.out.println(
                     "\n------------------------------------------------------------------------------------------------------------------");
-
+        } else if (help.toLowerCase().equals("cashier")) {
+            System.out.println(
+                    "\n---------------------------------------------------HELP CASHIER---------------------------------------------------");
+            System.out.println(
+                    "\ncashier modify [String: coin/note denomination] [String: new quantity] : Cashier is able to modify the quantity of a specific coin/note in the vending machine.\n    Example of a cashier changing the quantity of 50c:\n    > cashier modify 50c 10\n            Success! There are now 10x50c in the vending machine\n    Example of a cashier changing the quantity of $20:\n    > cashier modify 20 10\n            Success! There are now 10x$20 in the vending machine\n");
+            System.out.println(
+                    "\ncashier list : Provides the cashier with a list of available change, including the quantity of each coin and note in the vending machine.\n    Example:\n    > cashier list\n            ----------cashierAvailableChange.txt----------\n            Demonination: $100 | Quantity: 10\n            Demonination: $50 | Quantity: 10\n            Demonination: $20 | Quantity: 9\n            Demonination: $10 | Quantity: 8\n            ----------------------------------------------\n");
+            System.out.println(
+                    "\ncashier summary: Provides the cashier with a summary of transactions, including transaction date and time, item sold, money paid, change, and payment method.\n    Example:\n    > cashier summary\n            --------------------cashierSummary.txt--------------------\n            2022-11-01 (sp) | Paid: 20.0, Returned: 15.0, Method: cash\n            2022-11-01 (pe) | Paid: 5.0, Returned: 1.0, Method: cash\n            2022-11-01 (ju) | Paid: 10.0, Returned: 3.0, Method: cash\n            2022-10-31 (mm) | Paid: 20.0, Returned: 2.0, Method: cash\n            ----------------------------------------------------------\n");
+            System.out.println(
+                    "\n------------------------------------------------------------------------------------------------------------------");
         } else if (help.toLowerCase().equals("owner")) {
             System.out.println(
                     "\n---------------------------------------------------HELP OWNER---------------------------------------------------");
             System.out.println(
                     "\nowner remove [String: role] [String: account name] : Seller is able to remove a seller or cashier or owner that is not the owner itself.\n    Example:\n    > owner remove seller seller\n            Success!\n");
             System.out.println(
-                    "\nowner list : Provides the seller with txt file for the list of users and prints into the terminal.\n    Example:\n    > owner list\n            ----------users list.txt----------\n            owner | Role : owner\n            test | Role : buyer\n                      -------------------------------------\n");
+                    "\nowner list : Provides the seller with txt file for the list of users and prints into the terminal.\n    Example:\n    > owner list\n            ----------users list.txt----------\n            owner | Role : owner\n            test | Role : buyer\n            ----------------------------------\n");
             System.out.println(
                     "\nowner add [String: account name] [String: password] [String: role]: Seller is able to add a seller or cashier or owner.\n    Example:\n    > owner add account password seller\n            Success\n");
             System.out.println(
