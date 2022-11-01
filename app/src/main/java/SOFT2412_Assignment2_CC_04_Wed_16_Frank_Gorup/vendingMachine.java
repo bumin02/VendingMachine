@@ -11,6 +11,8 @@ import java.util.*;
 import java.io.FileWriter; // Import the FileWriter class
 import java.io.IOException; // Import the IOException class to handle errors
 
+
+
 public class vendingMachine {
     ArrayList<Item> items;
     User currentUser;
@@ -117,7 +119,7 @@ public class vendingMachine {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("You have been logged out due to inactivity.");
+                System.out.println(ANSI_RED +"You have been logged out due to inactivity."+ ANSI_RESET);
                 System.exit(0);
             }
         }, 120000);
@@ -131,7 +133,7 @@ public class vendingMachine {
                 boolean res = listOptions(input);
 
                 if (!res) {
-                    System.out.println("The category you specified does not exist.");
+                    System.out.println(ANSI_RED +"The category you specified does not exist."+ ANSI_RESET);
                 }
 
             }
@@ -148,18 +150,61 @@ public class vendingMachine {
                 makePurchase(input, sc);
             }
 
+            else if (input.toLowerCase().startsWith("cashier")) {
+                if (currentUser == null || !currentUser.getRole().equals("cashier")) {
+                    System.out.println(ANSI_RED +"Sorry you do not have cashier permission."+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
+                String[] inputList = input.toLowerCase().split(" ");
+                if (inputList.length < 2) {
+                    System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+                if (inputList[1].equals("modify")) {
+                    if (inputList.length < 4) {
+                        System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+                    int quant;
+                    try{
+                        quant = Integer.parseInt(inputList[3]);
+                    }catch (Exception e) {
+                        System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
+                        System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                        System.out.print("> ");
+                        continue;
+                    }
+
+                    cashReplenishment(inputList[2], quant);
+                }
+                else {
+                    System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
+                    System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
+                    System.out.print("> ");
+                    continue;
+                }
+
+            }
+
             else if (input.toLowerCase().startsWith("owner")) {
                 ArrayList<User> users = db.getAllUsers();
 
                 if (currentUser == null || !currentUser.hasOwnerPermissions()) {
-                    System.out.println("Sorry you do not have owner permission.");
+                    System.out.println(ANSI_RED +"Sorry you do not have owner permission."+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
                 }
                 String[] inputList = input.toLowerCase().split(" ");
                 if (inputList.length < 2) {
-                    System.out.println("Missing inputs. Please try again.");
+                    System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
@@ -170,12 +215,12 @@ public class vendingMachine {
                 }
                 else if (inputList[1].equals("remove")){
                     if (inputList.length < 4) {
-                        System.out.println("Missing inputs. Please try again.");
+                        System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
                     } else if (!inputList[3].toLowerCase(Locale.ROOT).equals("owner") && !inputList[3].toLowerCase(Locale.ROOT).equals("seller") && !inputList[3].toLowerCase(Locale.ROOT).equals("cashier")){
-                        System.out.println("Cannot remove the user with the role specified.");
+                        System.out.println(ANSI_RED +"Cannot remove the user with the role specified."+ ANSI_RESET);
                     }
 
                     boolean suc = false;
@@ -188,12 +233,12 @@ public class vendingMachine {
                         }
                     }
                     if (!suc) {
-                        System.out.println("Unsuccessful as an error has occurred. Please try again with valid input");
+                        System.out.println(ANSI_RED +"Unsuccessful as an error has occurred. Please try again with valid input"+ ANSI_RESET);
                     }
                 }
                 else if (inputList[1].equals("add")){
                     if (inputList.length < 5) {
-                        System.out.println("Missing inputs. Please try again.");
+                        System.out.println(ANSI_RED +"Missing inputs. Please try again."+ ANSI_RESET);
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
@@ -202,7 +247,7 @@ public class vendingMachine {
                     // Check whether account exist
                     for (User i: users) {
                         if (i.getAccount().equals(inputList[2])) {
-                            System.out.println("Account already exists.");
+                            System.out.println(ANSI_RED+ "Account already exists."+ ANSI_RESET);
                             System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                             System.out.print("> ");
                             continue;
@@ -210,27 +255,27 @@ public class vendingMachine {
                     }
 
                     if (!inputList[4].toLowerCase(Locale.ROOT).equals("owner") && !inputList[4].toLowerCase(Locale.ROOT).equals("seller") && !inputList[4].toLowerCase(Locale.ROOT).equals("cashier")){
-                        System.out.println("Cannot add the user with the role specified.");
+                        System.out.println(ANSI_RED +"Cannot add the user with the role specified."+ ANSI_RESET);
                     }
 
                     db.insertIntoUsersTable(inputList[2], inputList[3], inputList[4]);
                     System.out.println("Success");
                 }
                 else {
-                    System.out.println("Invalid command.");
+                    System.out.println(ANSI_RED +"Invalid command."+ ANSI_RESET);
                 }
             }
 
             else if (input.toLowerCase().startsWith("seller")) {
                 if (currentUser == null || !currentUser.hasSellerPermissions()) {
-                    System.out.println("ERROR: Sorry you do not have seller permissions.");
+                    System.out.println(ANSI_RED +"ERROR: Sorry you do not have seller permission."+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
                 }
                 String[] inputList = input.toLowerCase().split(" ");
                 if (inputList.length < 2) {
-                    System.out.println("ERROR: Missing inputs. Please try again.");
+                    System.out.println(ANSI_RED +"ERROR: Missing inputs. Please try again."+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                     System.out.print("> ");
                     continue;
@@ -245,7 +290,7 @@ public class vendingMachine {
 
                 else if (inputList[1].equals("modify")) {
                     if (inputList.length < 5) {
-                        System.out.println("ERROR: Missing inputs. Please try again.");
+                        System.out.println(ANSI_RED +"ERROR: Missing inputs. Please try again."+ ANSI_RESET);
                         System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
                         System.out.print("> ");
                         continue;
@@ -319,6 +364,10 @@ public class vendingMachine {
 
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
+            }
+
+            else if (input.toLowerCase().startsWith("logout")) {
+                logoutUser();
             }
 
             else if (input.toLowerCase().equals("exit")) {
@@ -570,19 +619,19 @@ public class vendingMachine {
 
     public int cashReplenishment(String denomination, int quantity) {
         if (quantity < 0) {
-            System.out.println("quantity cannot be negative.");
+            System.out.println(ANSI_RED +"quantity cannot be negative."+ ANSI_RESET);
             return 0;
         }
 
         if (db.getAmountOfChangeForDenomination(denomination) == 0) {
-            System.out.println("cash denomination does not exist.");
+            System.out.println(ANSI_RED +"cash denomination does not exist."+ ANSI_RESET);
             return 0;
         }
 
         if (db.insertIntoChangeTable(denomination, quantity) == 0) {
             return 0;
         } else {
-            System.out.println("SUCCESS");
+            System.out.printf("Success! There are now %dx%s in the vending machine%n", quantity, denomination);
             return 1;
         }
     }
@@ -882,7 +931,7 @@ public class vendingMachine {
         int fiftyDollars = 0;
         int hundredDollars = 0;
 
-        int[] cash = sumCash(userInput[4].split(","), fiveCents, tenCents, twentyCents, fiftyCents, oneDollar,
+        int[] cash = Backend.sumCash(userInput[4].split(","), fiveCents, tenCents, twentyCents, fiftyCents, oneDollar,
                 twoDollars,
                 fiveDollars, tenDollars,
                 twentyDollars, fiftyDollars, hundredDollars);
@@ -1200,50 +1249,6 @@ public class vendingMachine {
 
     }
 
-    public int[] sumCash(String[] cashInput, int fiveCents, int tenCents, int twentyCents, int fiftyCents,
-            int oneDollar,
-            int twoDollars, int fiveDollars, int tenDollars, int twentyDollars, int fiftyDollars, int hundredDollars) {
-
-        for (String s : cashInput) {
-
-            String cash[] = s.split("\\*");
-
-            String amount = cash[0];
-            int num = Integer.parseInt(cash[1]);
-
-            if (amount.equals("5c")) {
-                fiveCents += num;
-            } else if (amount.equals("10c")) {
-                tenCents += num;
-            } else if (amount.equals("20c")) {
-                twentyCents += num;
-            } else if (amount.equals("50c")) {
-                fiftyCents += num;
-            } else if (amount.equals("1")) {
-                oneDollar += num;
-            } else if (amount.equals("2")) {
-                twoDollars += num;
-            } else if (amount.equals("5")) {
-                fiveDollars += num;
-            } else if (amount.equals("10")) {
-                tenDollars += num;
-            } else if (amount.equals("20")) {
-                twentyDollars += num;
-            } else if (amount.equals("50")) {
-                fiftyDollars += num;
-            } else if (amount.equals("100")) {
-                hundredDollars += num;
-            } else {
-                return null;
-            }
-
-        }
-
-        int[] cash = { fiveCents, tenCents, twentyCents, fiftyCents, oneDollar, twoDollars, fiveDollars, tenDollars,
-                twentyDollars, fiftyDollars, hundredDollars };
-        return cash;
-
-    }
 
     public void makeCardPurchase(String userInput[], Scanner sc) {
 
@@ -1426,6 +1431,13 @@ public class vendingMachine {
 
     public void logoutUser() {
         this.currentUser = null;
+        System.out.println("Logged out");
+
+        deleteFiles("reports/availableItems.txt");
+        deleteFiles("reports/summary.txt");
+        deleteFiles("reports/usersList.txt");
+        deleteFiles("reports/cashierAvailableChange.txt");
+        deleteFiles("reports/cashierSummary.txt");
     }
 
 }
