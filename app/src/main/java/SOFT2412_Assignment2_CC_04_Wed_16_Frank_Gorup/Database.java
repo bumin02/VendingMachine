@@ -970,4 +970,39 @@ public class Database {
     }
   }
 
+  public ArrayList<Order> getAllCancelled() {
+
+    String getAllCancelled = "SELECT * FROM cancelledOrders;";
+
+    try (Connection conn = DriverManager.getConnection(dbURL);
+        Statement statement = conn.createStatement()) {
+
+      ResultSet rs = statement.executeQuery(getAllCancelled);
+
+      ArrayList<Order> orders = new ArrayList<>();
+
+      // create a list of orders from the result set
+      while (rs.next()) {
+        
+        int id = rs.getInt("id");
+        int userId = rs.getInt("userId");
+        LocalDate date = LocalDate.parse(rs.getString("date"));
+        String reason = rs.getString("reason");
+
+        Order order = new Order(id, userId, date, -1, -1, -1, -1, reason);
+        orders.add(order);
+
+      }
+
+      return orders;
+
+    } catch (SQLException e) {
+
+      System.out.println(e.getMessage());
+      return null;
+
+    }
+
+  }
+
 }

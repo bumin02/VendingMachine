@@ -167,6 +167,7 @@ public class vendingMachine {
                 }
                 if (inputList[1].equals("list")) {
                     ownerLsUsersTerminal();
+                    onwerLsCancelledOrders();
                 }
                 else if (inputList[1].equals("remove")){
                     if (inputList.length < 4) {
@@ -361,6 +362,19 @@ public class vendingMachine {
             e.printStackTrace();
         }
 
+    }
+
+    public void onwerLsCancelledOrders() {
+        System.out.println("---------------cancelled orders list.txt---------------");
+        ArrayList<Order> orders = db.getAllCancelled();
+
+        if (orders != null) {
+            for (Order i: orders) {
+                String message = String.format("Order ID: %s | Order User: %s | Date: %s | Reason: %s" ,i.getId(), i.getUserId(), i.getDate(), i.getPaymentMethod());
+                System.out.println(message);
+            }
+        }
+        System.out.println("------------------------------------------------------\n");
     }
 
     public void sellerLs() {
@@ -567,6 +581,7 @@ public class vendingMachine {
             }
             else if  (this.currentUser.hasOwnerPermissions()){
                 ownerLsUsersTxt();
+                //onwerLsCancelledOrders();
                 System.out.println("check usersList.txt for owner reports");
             }
 
