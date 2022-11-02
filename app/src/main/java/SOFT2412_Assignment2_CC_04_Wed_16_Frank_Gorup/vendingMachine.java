@@ -50,7 +50,7 @@ public class vendingMachine {
 
         // dummy items with quantities and prices defined
         this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
-        this.db.insertIntoItemsTable("sprite", "sp", "drinks", 5, 10);
+        this.db.insertIntoItemsTable("sprite", "sr", "drinks", 5, 10);
         this.db.insertIntoItemsTable("coca cola", "cc", "drinks", 5, 10);
         this.db.insertIntoItemsTable("pepsi", "pe", "drinks", 4, 10);
         this.db.insertIntoItemsTable("juice", "ju", "drinks", 3.5, 10);
