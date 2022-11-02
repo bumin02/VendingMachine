@@ -699,12 +699,12 @@ public class Database {
 
       }
 
-      return 0;
+      return -1;
 
     } catch (SQLException e) {
 
       System.out.println(e.getMessage());
-      return 0;
+      return -1;
 
     }
 
