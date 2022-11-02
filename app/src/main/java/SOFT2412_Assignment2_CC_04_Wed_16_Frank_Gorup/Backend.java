@@ -1,19 +1,10 @@
 package SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup;
 
-import java.io.File;
-import java.time.LocalDate;
-import java.util.Scanner;
-
-class Backend extends vendingMachine {
-    Database db;
-
-    public Backend(Database db) {
-        super(db);
-    }
+class Backend {
 
     public static int[] sumCash(String[] cashInput, int fiveCents, int tenCents, int twentyCents, int fiftyCents,
-                         int oneDollar,
-                         int twoDollars, int fiveDollars, int tenDollars, int twentyDollars, int fiftyDollars, int hundredDollars) {
+            int oneDollar,
+            int twoDollars, int fiveDollars, int tenDollars, int twentyDollars, int fiftyDollars, int hundredDollars) {
 
         for (String s : cashInput) {
 
@@ -56,10 +47,4 @@ class Backend extends vendingMachine {
 
     }
 
-
-
-
 }
-
-
-

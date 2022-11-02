@@ -74,4 +74,13 @@ public class OrderTest {
 
   }
 
+  @Test
+  public void testToString() {
+
+    assertEquals(
+        "Order [itemId=1, quantity=1]",
+        this.order.toString());
+
+  }
+
 }

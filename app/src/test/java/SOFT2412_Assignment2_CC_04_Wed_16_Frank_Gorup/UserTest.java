@@ -138,4 +138,12 @@ public class UserTest {
 
   }
 
+  @Test
+  public void testGetRole() {
+
+    this.user = new User(123, "Account", "Password", "owner", -1);
+    assertEquals("owner", this.user.getRole());
+
+  }
+
 }
