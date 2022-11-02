@@ -184,6 +184,15 @@ public class vendingMachine {
 
                     cashReplenishment(inputList[2], quant);
                 }
+
+                else if (inputList[1].equals("list")) {
+                    cashierLs();
+                }
+
+                else if (inputList[1].equals("summary")) {
+                    cashierSummary();
+                } 
+
                 else {
                     System.out.println(ANSI_RED +"Invalid Input"+ ANSI_RESET);
                     System.out.println("\nWhat would you like to do? (type help for instructions, exit to quit)");
@@ -343,8 +352,6 @@ public class vendingMachine {
                 }
             }
 
-            // create functionality for cashier here
-
             else if (input.toLowerCase().startsWith("help")) {
                 helpOptions(input);
             }
@@ -437,7 +444,7 @@ public class vendingMachine {
             System.out.println(message);
         }
 
-        System.out.println("-------------------------------------\n");
+        System.out.println("-------------------------------------");
     }
 
     public void sellerSummary() {
@@ -457,7 +464,7 @@ public class vendingMachine {
             System.out.println(message);
         }
 
-        System.out.println("--------------------------------------\n");
+        System.out.println("--------------------------------------");
     }
 
     public void getSellerReport() {
@@ -506,12 +513,56 @@ public class vendingMachine {
         }
     }
 
+    public void cashierLs() {
+        System.out.println("----------cashier_report.txt----------");
+        ArrayList<Item> items = db.getAllItems();
+
+        String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
+
+        for (String i : denominations) {
+            int denominationQuantity = db.getAmountOfChangeForDenomination(i);
+            if (i.charAt(i.length()-1) == 'c') {
+                String message = String.format("Demonination: " + i + " | Quantity: " + denominationQuantity);
+                System.out.println(message);
+            }
+            else { // if denomination if not a coin, add a $ in front of it
+                String message = String.format("Demonination: $" + i + " | Quantity: " + denominationQuantity);
+                System.out.println(message);
+            }
+        }
+        System.out.println("-------------------------------------");
+    }
+
+    public void cashierSummary() {
+
+        ArrayList<Order> orders = this.db.getOrders();  
+        String purchasedItemCode = "-";
+
+        if (orders == null) {
+            System.out.println("---------- no orders have been placed ----------");
+        }
+
+        else {
+            System.out.println("-------------------cashier_summary---------------------");
+            for (Order order : orders) {
+                for (Item i : items) {
+                    if (i.getId() == order.getItemId()) {
+                        purchasedItemCode = i.getCode();
+                    }
+                }
+                String message = String.format("%s (%s) | Paid: %s, Returned: %s, Method: %s\r", order.getDate(), purchasedItemCode, order.getAmountPaid(), order.getChange(), order.getPaymentMethod());
+                System.out.println(message);
+            }
+            System.out.println("--------------------------------------------------------");
+        }
+    }
+
     public void getCashierReport() {
         try {
             FileWriter writeChange = new FileWriter("reports/cashierAvailableChange.txt");
             ArrayList<Item> items = db.getAllItems();
 
-            String[] denominations = {"100", "50", "20", "10", "5", "1", "50c", "20c", "10c", "5c"};
+            String[] denominations = {"100", "50", "20", "10", "5", "2", "1", "50c", "20c", "10c", "5c"};
 
             for (String i : denominations) {
                 int denominationQuantity = db.getAmountOfChangeForDenomination(i);

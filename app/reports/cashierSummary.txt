@@ -1,9 +1,0 @@
-2022-11-01 (sp) | Paid: 20.0, Returned: 15.0, Method: cash
-2022-11-01 (pe) | Paid: 5.0, Returned: 1.0, Method: cash
-2022-11-01 (ju) | Paid: 10.0, Returned: 3.0, Method: cash
-2022-10-31 (mm) | Paid: 20.0, Returned: 2.0, Method: cash
-2022-10-31 (mm) | Paid: 20.0, Returned: 2.0, Method: cash
-2022-11-01 (mm) | Paid: 10.0, Returned: 4.0, Method: cash
-2022-10-31 (bo) | Paid: 50.0, Returned: 35.0, Method: cash
-2022-10-31 (pr) | Paid: 20.0, Returned: 2.0, Method: cash
-2022-11-01 (sk) | Paid: 10.0, Returned: 4.0, Method: cash
