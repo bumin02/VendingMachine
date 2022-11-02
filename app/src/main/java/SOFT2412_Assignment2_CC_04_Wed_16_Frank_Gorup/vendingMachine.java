@@ -74,6 +74,7 @@ public class vendingMachine {
         this.db.insertIntoChangeTable("20c", 10);
         this.db.insertIntoChangeTable("50c", 10);
         this.db.insertIntoChangeTable("1", 10);
+        this.db.insertIntoChangeTable("2", 10);
         this.db.insertIntoChangeTable("5", 10);
         this.db.insertIntoChangeTable("10", 10);
         this.db.insertIntoChangeTable("20", 10);
@@ -613,12 +614,12 @@ public class vendingMachine {
             return 0;
         }
 
-        if (db.getAmountOfChangeForDenomination(denomination) == 0) {
+        if (db.getAmountOfChangeForDenomination(denomination) == -1) {
             System.out.println(ANSI_RED + "cash denomination does not exist." + ANSI_RESET);
             return 0;
         }
 
-        if (db.insertIntoChangeTable(denomination, quantity) == 0) {
+        if (db.updateChangeForDenomination(denomination, quantity) == 0) {
             return 0;
         } else {
             System.out.printf("Success! There are now %dx%s in the vending machine%n", quantity, denomination);
