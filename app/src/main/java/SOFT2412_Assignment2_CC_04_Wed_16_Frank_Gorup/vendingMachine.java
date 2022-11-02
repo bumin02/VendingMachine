@@ -30,57 +30,10 @@ public class vendingMachine {
         this.currentUser = null;
         this.items = new ArrayList<>();
 
-        // for setup if needed
-        // initialSetup();
     }
 
     public User getCurrentUser() {
         return this.currentUser;
-    }
-
-    // helper function to add items to the vending machine
-    public void initialSetup() {
-        deleteFiles("./src/vendingMachine.db");
-
-        // fake user
-        this.db.insertIntoUsersTable("owner", "owner", "owner");
-        this.db.insertIntoUsersTable("test", "test", "buyer");
-        this.db.insertIntoUsersTable("seller", "seller", "seller");
-        this.db.insertIntoUsersTable("cashier", "cashier", "cashier");
-
-        // dummy items with quantities and prices defined
-        this.db.insertIntoItemsTable("mineral Water", "mw", "drinks", 3, 20);
-        this.db.insertIntoItemsTable("sprite", "sr", "drinks", 5, 10);
-        this.db.insertIntoItemsTable("coca cola", "cc", "drinks", 5, 10);
-        this.db.insertIntoItemsTable("pepsi", "pe", "drinks", 4, 10);
-        this.db.insertIntoItemsTable("juice", "ju", "drinks", 3.5, 10);
-
-        this.db.insertIntoItemsTable("mars", "ma", "chocolates", 5, 12);
-        this.db.insertIntoItemsTable("m&m", "mm", "chocolates", 6, 12);
-        this.db.insertIntoItemsTable("bounty", "bo", "chocolates", 5, 12);
-        this.db.insertIntoItemsTable("snickers", "sn", "chocolates", 7, 12);
-
-        this.db.insertIntoItemsTable("smiths", "sm", "chips", 5, 10);
-        this.db.insertIntoItemsTable("pringles", "pr", "chips", 6, 10);
-        this.db.insertIntoItemsTable("kettle", "ke", "chips", 5, 10);
-        this.db.insertIntoItemsTable("thins", "th", "chips", 4, 10);
-
-        this.db.insertIntoItemsTable("mentos", "me", "candies", 3, 15);
-        this.db.insertIntoItemsTable("sour patch", "sp", "candies", 5, 12);
-        this.db.insertIntoItemsTable("skittles", "sk", "candies", 6, 12);
-
-        this.db.insertIntoChangeTable("5c", 10);
-        this.db.insertIntoChangeTable("10c", 10);
-        this.db.insertIntoChangeTable("20c", 10);
-        this.db.insertIntoChangeTable("50c", 10);
-        this.db.insertIntoChangeTable("1", 10);
-        this.db.insertIntoChangeTable("2", 10);
-        this.db.insertIntoChangeTable("5", 10);
-        this.db.insertIntoChangeTable("10", 10);
-        this.db.insertIntoChangeTable("20", 10);
-        this.db.insertIntoChangeTable("50", 10);
-        this.db.insertIntoChangeTable("100", 10);
-
     }
 
     public void runVendingMachine() {
