@@ -7,5 +7,5 @@
  * in the user manual at https://docs.gradle.org/7.4.2/userguide/multi_project_builds.html
  */
 
-rootProject.name = 'SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup-3-'
+rootProject.name = 'vendingMachine'
 include('app')

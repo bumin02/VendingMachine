@@ -41,7 +41,7 @@ run {
 
 application {
     // Define the main class for the application.
-    mainClass = 'SOFT2412_Assignment2_CC_04_Wed_16_Frank_Gorup.App'
+    mainClass = 'vendingMachine.App'
 }
 
 tasks.named('test') {
